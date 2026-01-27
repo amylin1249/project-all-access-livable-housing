@@ -11,7 +11,7 @@
 ### Data Source #1..N
 
 Source URL: {https://...}
-Source Type: {Scraped/Bulk Data/API}
+Source Type: {API}
 Approximate Number of Records (rows):
 Approximate Number of Attributes (columns): 
 Current Status: {At this point, you should have interacted with your data, describe the current status. Have you written code for an API or web scraper yet, explored the data, etc.?}
