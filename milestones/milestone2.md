@@ -10,7 +10,7 @@
 
 ### Data Source #1..N
 
-Source URL: {https://...}
+Source URL: {https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/about_data, 2) https://data.sfgov.org/Housing-and-Buildings/Quarterly-count-of-tents-structures-and-lived-in-v/w9ip-yrij/about_data, 3) https://data.sfgov.org/Health-and-Social-Services/HSH-Shelter-Waitlist/w4sk-nq57/about_data}
 Source Type: {Scraped/Bulk Data/API}
 Approximate Number of Records (rows):
 Approximate Number of Attributes (columns): 
