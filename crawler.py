@@ -12,14 +12,6 @@ def get_data(
     starting_url="https://data.sfgov.org/api/archival.csv?id=w4sk-nq57&version=4867&method=export",
 ):
     """
-    This function takes a URL to a page of parks and returns a
-    list of URLs to each park on that page.
-
-    Parameters:
-        * url:  a URL to a page of parks
-
-    Returns:
-        A list of URLs to each park on the page.
     """
     url = starting_url
     # current version number Feb 8 2026
