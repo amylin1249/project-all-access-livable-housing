@@ -1,0 +1,55 @@
+# Research on homeless estimates
+(Haeji) 2024 SF point-in-time counts -- mentions that families tend to live in vehicles while singles live in tents
+
+## Data Sources
+
+### Data Source #1: DataSF Open Data Portal
+#### Data Source #1.1: 311 Cases
+(Lily) work in progress
+
+#### Data Source #1.2: Quarterly count of tents, structures, and lived-in vehicles
+(Amy) email with bryan.v.wong@sfgov.org on 02/09/2026 - trying to get access to underlying dataset for map
+
+#### Data Source #1.3: HSH Shelter Waitlist
+(Amy) email with HSHSunshine@sfgov.org on 02/09/2026 - trying to get access to archives past July 5, 2024
+(Amy/Amanda) wrote code that scrapes the archives, functional aside from when loading a webpage takes too long - emailed James 02/09/2026
+
+### Data Source #2: Census Data
+#### Data Source #2.1: ACS data on rental costs and demographic data 
+(Amanda) work in progress
+
+#### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
+(Amanda) work in progress
+
+### Data Source #3: Zillow Observed Renter Index (ZORI)
+(Haeji) work in progress
+
+## Data Reconciliation Plan
+
+Source 1.1 (311 calls): location = lat, long; date = requested_datetime
+Source 1.2 (Tents): location = lat, long; date = quarterly
+Source 1.3 (HSH shelter): date = data_as_of
+Source 2 (ACS): location = GEOID
+Source 3 (ZORI): location = RegionName; date = individual columns (there is a column for every month)
+
+## Project Plan
+
+1. Finish extracting all data. (Week 5)
+- We currently have data sources 1.1, 2.1, 2.2, and 3 downloaded as CSV files.
+- We will need to webscrape to get the data we need from 1.2. (Lily/Haeji)
+- We will need to use get requests to get the data we need from 1.3. (Amy/Amanda)
+
+2. Clean and process data across all sources, including addressing missing values and doing interpolations as needed to estimate locations and dates. (Week 6)
+- Data source 1.1: This is daily data with specific latitudes/longitudes. We will need to aggregate it into monthly counts. (Amanda)
+- Data source 1.2: This is quarterly data with specific latitudes/longitudes. We will need to interpolate it so that it is monthly. (Lily)
+- Data source 1.3: This is daily data with no location. We will need to aggregate it into monthly counts and then estimate its geographic distribution based on data sources 1.2 and 1.3. (Haeji)
+- Data sources 2.1 and 2.2: We need to combine these so that we have the census data for the census tracts specifically within SF. (Amanda)
+- Data source 3: This is monthly data with zip code for location. We will need to combine it with data sources 2.1 and 2.2 to estimate its geographic distribution within census tracts. (Amy)
+
+3. ⁠Integrate data sources via spatial joins, matching point-level data to SF census tracts. (Week 7) (Amanda/Amy)
+
+4. ⁠Conduct statistical analysis to assess correlations between homelessness measures, housing prices, and demographic indicators across census tracts over time. (Week 7) (Lily/Haeji)
+
+5. ⁠Develop a predictive or simulation model to examine potential changes in homelessness measures against changes in rent prices. (Week 8) (Amanda/Amy/Lily/Haeji)
+
+6. ⁠Create map-based and time-series visualizations to communicate patterns and relationships in homelessness, housing costs, and demographics. (Week 9) (Amanda/Amy/Lily/Haeji)
