@@ -13,13 +13,16 @@
 #### Data Source #1.3: HSH Shelter Waitlist
 (Amy) email with HSHSunshine@sfgov.org on 02/09/2026 - trying to get access to archives past July 5, 2024
 (Amy/Amanda) wrote code that scrapes the archives, functional aside from when loading a webpage takes too long - emailed James 02/09/2026
+(Amanda) updated code to use the method that gets the date and version number of each (daily) dataset from a hidden API, instead of manually extracting start/end version numbers and changing version numbers as we iterate through. issue persists where the data is not downloaded if loading the webpage takes too long after we run the code  
 
 ### Data Source #2: Census Data
 #### Data Source #2.1: ACS data on rental costs and demographic data 
-(Amanda) work in progress
+(Amanda) download done -- downloaded ACS data for 2020-24 5-year period for population, rent, household income, and race; uploaded data (specifically for San Francisco county) in the data/census folder
+(Amanda) wrote code to clean and extract data from the relevant column for each ACS dataset
 
 #### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
-(Amanda) work in progress
+(Amanda) download done -- downloaded SF 2020 census tracts
+(Amanda) wrote code to match ACS data to the SF census tracts (that only have geometry and GEOID fields populated); still debugging an issue about exceeding the field limit
 
 ### Data Source #3: Zillow Observed Renter Index (ZORI)
 (Haeji) work in progress
