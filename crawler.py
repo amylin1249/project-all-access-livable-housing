@@ -29,7 +29,7 @@ def get_data():
     while shelters_next_page:
         # Access first page of hidden API (i.e., most recent records)
         time.sleep(REQUEST_DELAY)
-        shelters_json = httpx.get(API_URL).json()
+        shelters_json = httpx.get(next_page_url).json()
 
         # Get key fields of each record (i.e., counts per day)
         for record in shelters_json["resource"]:
@@ -46,9 +46,9 @@ def get_data():
             # HAVEN'T ACCOUNTED FOR TIMEOUT ERRORS YET
             counts_per_month[year_month] = counts_per_month.get(year_month, 0) + len(data)
             days_per_month[year_month] = days_per_month.get(year_month, 0) + 1
-    
+
         shelters_next_page = shelters_json["meta"]["next"]
-        next_page_url = next_page_url + shelters_next_page
+        next_page_url = API_URL + shelters_next_page
 
     return counts_per_month, days_per_month
 
