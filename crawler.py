@@ -40,12 +40,15 @@ def get_data():
             time.sleep(REQUEST_DELAY)
             export_resp = httpx.get(export_url)
 
-            # Split data into rows, excluding header and last blank row
-            data = export_resp.text.split("\n")[1:-1]
+            # Only include URLs that autodownload CSV file in the counts;
+            # excludes any URL that leads to timeout error
+            if export_resp.headers.get("Content-Type").startswith("text/csv"):
 
-            # HAVEN'T ACCOUNTED FOR TIMEOUT ERRORS YET
-            counts_per_month[year_month] = counts_per_month.get(year_month, 0) + len(data)
-            days_per_month[year_month] = days_per_month.get(year_month, 0) + 1
+                # Split data into rows, excluding header and last blank row
+                data = export_resp.text.split("\n")[1:-1]
+
+                counts_per_month[year_month] = counts_per_month.get(year_month, 0) + len(data)
+                days_per_month[year_month] = days_per_month.get(year_month, 0) + 1
 
         shelters_next_page = shelters_json["meta"]["next"]
         if shelters_next_page:
