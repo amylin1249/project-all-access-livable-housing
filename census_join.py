@@ -1,4 +1,5 @@
 import csv
+import sys
 from pathlib import Path
 from shapely.geometry import Point, Polygon
 from typing import NamedTuple
@@ -15,7 +16,7 @@ RENT_ID = "AUWGE001"
 HH_INC_ID = "AURUE001"
 WHITE_POP_ID = "AUO7E002"
 
-KEYS = ["geom", "geo_id", "population", "median_rent", "median_hh_income", "white_pct"]
+KEYS = ["geo_id", "geom", "population", "median_rent", "median_hh_income", "white_pct"]
 
 
 # class CleanedData(NamedTuple):
@@ -49,7 +50,7 @@ def clean_acs_data(file_path: str, col_name: str) -> dict:
             data = int(row[col_name])
             if data >= 0:
                 cleaned_data[geo_id] = data
-            else: 
+            else:
                 cleaned_data[geo_id] = None
 
     return cleaned_data
@@ -59,6 +60,8 @@ def join_census_tracts():
     """
     Docstring for join_census_tracts
     """
+    csv.field_size_limit(sys.maxsize)
+
     with open(SF_CENSUS_PATH) as f:
         reader = csv.DictReader(f)
 
@@ -70,15 +73,19 @@ def join_census_tracts():
                 geom = row["the_geom"]
                 geo_id = row["geoid"]
                 population = clean_acs_data(POP_PATH, POP_ID)[geo_id]
+
+                if population > 0:
+                    white_pct = clean_acs_data(RACE_PATH, WHITE_POP_ID)[geo_id] / population
+                else:
+                    white_pct = None
                 
-                # CHECK IF STARTSWITH WORKS HERE
                 if geom.startswith("MULTIPOLYGON") and geo_id:
-                    writer.writerow({KEYS[0]: geom,
-                                    KEYS[1]: geo_id,
-                                    KEYS[2]: population,
-                                    KEYS[3]: clean_acs_data(RENT_PATH, RENT_ID)[geo_id],
-                                    KEYS[4]: clean_acs_data(HH_INC_PATH, HH_INC_ID)[geo_id],
-                                    KEYS[5]: clean_acs_data(RACE_PATH, WHITE_POP_ID)[geo_id] / population})
+                    writer.writerow({KEYS[0]: geo_id,
+                                     KEYS[1]: geom,
+                                     KEYS[2]: population,
+                                     KEYS[3]: clean_acs_data(RENT_PATH, RENT_ID)[geo_id],
+                                     KEYS[4]: clean_acs_data(HH_INC_PATH, HH_INC_ID)[geo_id],
+                                     KEYS[5]: white_pct})
 
 
 if __name__ == "__main__":
