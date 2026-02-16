@@ -12,6 +12,7 @@
 
 #### Data Source #1.3: HSH Shelter Waitlist
 (Amy) email with HSHSunshine@sfgov.org on 02/09/2026 - trying to get access to archives past July 5, 2024
+request formally submitted 02/10/2026 - follow-up from department required by 02/19/2026 
 (Amy/Amanda) wrote code that scrapes the archives, functional aside from when loading a webpage takes too long - emailed James 02/09/2026
 
 ### Data Source #2: Census Data
