@@ -27,7 +27,10 @@ request formally submitted 02/10/2026 - follow-up from department required by 02
 (Amanda) wrote code to match ACS data to the SF census tracts (that only have geometry and GEOID fields populated); still debugging an issue about exceeding the field limit
 
 ### Data Source #3: Zillow Observed Renter Index (ZORI)
-(Haeji) work in progress
+(Haeji) download done --  downloaded ZORI zip-level data
+(Haeji) wrote code to filter and clean -- isolated 23 San Francisco ZIP codes and filtered time series for the 2020-2024 period
+(Haeji) wrote code to reshape and match -- reshaped wide-format data into long-format (melted) to support time-series analysis
+(Haeji) completed data architecture -- developed `zori_filter.py` to auto-generate both a cleaned CSV file and a `rent_dict` {month: (zip, rent)} for seamless merging with homeless datasets.
 
 ## Data Reconciliation Plan
 
