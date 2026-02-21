@@ -12,4 +12,6 @@ dependencies = [
     "sodapy>=2.2.0",
     "lxml>=6.0.2",
     "shapely>=2.1.2",
+    "pyshp>=3.0.3",
+    "geopandas>=1.1.2",
 ]

@@ -1,13 +1,16 @@
 import csv
 import sys
+import shapefile
+import geopandas as gpd
+from pathlib import Path
 from shapely.geometry import Point, Polygon
 
 
-SF_CENSUS_PATH = "data/census/sf_census_tracts_2020.csv"
-POP_PATH = "data/census/acs_sf_population_2020_24.csv"
-RENT_PATH = "data/census/acs_sf_median_rent_2020_24.csv"
-HH_INC_PATH = "data/census/acs_sf_median_hh_income_2020_24.csv"
-RACE_PATH = "data/census/acs_sf_race_2020_24.csv"
+SF_CENSUS_PATH = "raw-data/census/sf_census_tracts_2020.csv"
+POP_PATH = "raw-data/census/acs_sf_population_2020_24.csv"
+RENT_PATH = "raw-data/census/acs_sf_median_rent_2020_24.csv"
+HH_INC_PATH = "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
+RACE_PATH = "raw-data/census/acs_sf_race_2020_24.csv"
 
 POP_ID = "AUO6E001"
 RENT_ID = "AUWGE001"
@@ -49,6 +52,32 @@ def clean_acs_data(file_path: str, col_name: str) -> dict:
     return cleaned_data
 
 
+def get_sf_geoid() -> list[str]:
+    """
+    Docstring
+    """
+    sf_geoid = []
+
+    with open(SF_CENSUS_PATH) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            geom = row["the_geom"]
+            geo_id = row["geoid"]
+
+            if geom.startswith("MULTIPOLYGON") and geo_id:
+                sf_geoid.append(geo_id)
+    
+    return sf_geoid
+
+
+def filter_sf_tracts():
+    """
+    Docstring
+    """
+    gdf = gpd.read_file("raw-data/census/cali_tracts_shapefiles_")
+
+
+
 def join_census_tracts():
     """
     Docstring for join_census_tracts
@@ -58,7 +87,7 @@ def join_census_tracts():
     with open(SF_CENSUS_PATH) as f:
         reader = csv.DictReader(f)
 
-        with open("census_acs_join.csv", "w") as f:
+        with open("clean-data/census_acs_join.csv", "w") as f:
             writer = csv.DictWriter(f, KEYS)
             writer.writeheader()
 
@@ -85,6 +114,28 @@ def join_census_tracts():
                             KEYS[5]: white_pct,
                         }
                     )
+
+
+def load_shapefiles(path: Path) -> Tract:
+    """
+    Extract and parse polygons from Census shapefiles.
+    """
+    tracts = []
+    with shapefile.Reader(path) as sf:
+        # This iterates over all shapes with their associated data.
+        for shape_rec in sf.shapeRecords():
+            # the shape_rec object here has two properties of interest
+            #    shape_rec.record - dict containing the data attributes
+            #                       associated with the shape
+            #    shape_rec.shape.points - list of WKT points, used to construct
+            #                             a shapely.Polygon
+            tracts.append(
+                Tract(
+                    id=shape_rec.record["TRACTCE"],
+                    polygon=Polygon(shape_rec.shape.points),
+                )
+            )
+    return tracts
 
 
 if __name__ == "__main__":
