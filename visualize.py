@@ -3,6 +3,7 @@ import shapefile
 import folium
 import pathlib
 import webbrowser
+import pandas as pd
 import geopandas as gpd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -93,37 +94,56 @@ def create_scatterplot():
     """
     sns.set_theme(style="whitegrid")
 
-    # Load the example diamonds dataset
-    diamonds = sns.load_dataset("diamonds")
+    # Load dataset
+    dataset = pd.read_csv(
+        "clean-data/census_acs_join.csv"
+    )  ### To update string with the dataset name
+
+    # Filter dataset to remove tracts with population of 0
+    filtered = dataset[dataset["population"] > 0]
 
     # Draw a scatter plot while assigning point colors and sizes to different
     # variables in the dataset
     f, ax = plt.subplots(figsize=(6.5, 6.5))
     sns.despine(f, left=True, bottom=True)
-    clarity_ranking = ["I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF"]
-    sns.scatterplot(x="carat", y="price",
-                    hue="clarity", size="depth",
-                    palette="ch:r=-.2,d=.3_r",
-                    hue_order=clarity_ranking,
-                    sizes=(1, 8), linewidth=0,
-                    data=diamonds, ax=ax)
+    sns.scatterplot(
+        x="med_hh_inc",
+        y="med_rent",  ### To update these to the right metrics once dataset finalized
+        hue="white_pct",
+        size="population",  ### To update these to the right metrics once dataset finalized
+        palette="ch:r=-.2,d=.3_r",
+        sizes=(1, 100),
+        linewidth=0,
+        data=filtered,
+        ax=ax,
+    )
+    plt.xlabel("Median annual household income ($)", fontsize=12)
+    plt.ylabel("Median monthly rent ($)", fontsize=12)
+    plt.title(
+        "Median rent vs. Median household income by tract",
+        fontsize=14,
+        fontweight="bold",
+    )
+    plt.show()
 
 
 TO_PROJ_EPSG = "EPSG:4326"  # WGS 84 global projection
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(
-            "Usage: uv run python visualize.py path/to/shapefile.shp"
-        )
-        sys.exit(1)
+    # if len(sys.argv) != 2:
+    #     print(
+    #         "Usage: uv run python visualize.py path/to/shapefile.shp"
+    #     )
+    #     sys.exit(1)
 
-    filename = sys.argv[1]
+    # filename = sys.argv[1]
 
-    shapefile_data = load_shapefile(filename)
-    prj_file = filename.replace("shp", "prj")
-    from_epsg = get_epsg_from_file(prj_file)
-    data = reproject_geometries(shapefile_data, from_epsg, TO_PROJ_EPSG)
+    # shapefile_data = load_shapefile(filename)
+    # prj_file = filename.replace("shp", "prj")
+    # from_epsg = get_epsg_from_file(prj_file)
+    # data = reproject_geometries(shapefile_data, from_epsg, TO_PROJ_EPSG)
 
-    quick_map(data)
-    # uv run python visualize.py clean-data/merged_sf_shapefiles/merged_sf_tracts.shp
+    # quick_map(data)
+    # # uv run python visualize.py clean-data/merged_sf_shapefiles/merged_sf_tracts.shp
+
+    create_scatterplot()

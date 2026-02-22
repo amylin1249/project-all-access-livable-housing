@@ -12,7 +12,7 @@
 
 
 ## An initial draft of data reconciliation/cleaning process.
-- Cleaned data for 311 cases, ZORI, encampments, census and ACS; imputed missing data for ZORI (refer to process_data.py for code)
+- Cleaned data for 311 cases, ZORI, encampments (TBD), census and ACS; imputed missing data for ZORI (refer to process_data.py for code)
 - Started reconciling data by joining ACS data to the respective census tracts in the shapefiles (refer to process_data.py for code) and wrote code to match point data to census tracts via quadtrees (refer to quadtree.py for code)
 
 
@@ -21,7 +21,8 @@
 ![Visualization of SF tracts using Folium](tracts_folium.png)
 ![Visualization of SF tracts using MatPlotLib](tracts_matplotlib.png)
 - End goal is to have two different visualizations - (1) heatmap of SF tracts based on homelessness rates, hopefully interactive with homelessness rates displayed based on the time period selected, and with census tract statistics displayed if the user clicks on a specific census tract (e.g., population, median rent, etc.); (2) scatter plot of key statistics (e.g., percentile of homelessness against percentile of eviction rates across the full period of analysis 2020-24)
-![Mock-up of heatmap](mockup_heatmap.png)
+![Mockup of heatmap](mockup_heatmap.png)
+![Mockup of scatter plot](mockup_scatterplot.png)
 
 
 ## The beginning of a README.

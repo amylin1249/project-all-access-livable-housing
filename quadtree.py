@@ -8,7 +8,10 @@ class Location(NamedTuple):
     id: int
     latitude: float
     longitude: float
+
+
 ### TBD on attributes
+
 
 class Tract(NamedTuple):
     id: str
@@ -40,7 +43,6 @@ def load_shapefiles(path: pathlib.Path) -> list[Tract]:
 
 
 ### Include code that loads the points data from other sources
-
 
 
 class QuadtreeError(Exception):

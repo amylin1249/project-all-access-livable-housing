@@ -23,7 +23,7 @@ request formally submitted 02/10/2026 - follow-up from department required by 02
 (Amanda) download done -- downloaded ACS data for 2020-24 5-year period for population, rent, household income, and race; uploaded data (specifically for San Francisco county) in the data/census folder
 (Amanda) wrote code to clean and extract data from the relevant column for each ACS dataset
 (Amanda) wrote code on quadtrees (mainly from PA 4) to match points to census tracts; slight changes from PA 4 to store match output as a dictionary instead of a tuple, and changed to SF bounding box 
-(Amanda) started visualization of SF tracts (mainly used code from Lab 3 on GIS); to be further improved and re-evaluated post-visualizations class to make it interactive
+(Amanda) started visualization of map of SF tracts (mainly used code from Lab 3 on GIS) and scatter plot; to be further improved and re-evaluated post-visualizations class to make them interactive
 
 #### Data Source #2.2: Listing and geographic boundaries of census tracts in SF
 (Amanda) download done -- downloaded SF 2020 census tracts

@@ -61,7 +61,7 @@ def join_acs_data():
     """
     Docstring
     """
-    ### Change function to use PD? 
+    ### Change function to use PD?
     csv.field_size_limit(sys.maxsize)
 
     cleaned_pop_acs = clean_acs_data(POP_PATH, POP_ID)
@@ -81,7 +81,7 @@ def join_acs_data():
                 population = cleaned_pop_acs[geo_id]
 
                 if population > 0:
-                    white_pct = (cleaned_race_acs[geo_id] / population)
+                    white_pct = cleaned_race_acs[geo_id] / population
                 else:
                     white_pct = None
 
@@ -105,14 +105,14 @@ def get_sf_geoid() -> list[str]:
         List of SF census tract GeoIDs
     """
     sf_geoid = []
-    
+
     csv.field_size_limit(sys.maxsize)
 
     with open(SF_CENSUS_PATH) as f:
         reader = csv.DictReader(f)
         for row in reader:
             sf_geoid.append(row["geoid"])
-    
+
     return sf_geoid
 
 
@@ -140,7 +140,7 @@ def add_sf_tract_data():
     # sf_tracts shapefile
     sf_acs_data.rename(columns={"geo_id": "GEOID"}, inplace=True)
 
-    updated_sf_tracts = sf_tracts.merge(sf_acs_data, on="GEOID", how="left") 
+    updated_sf_tracts = sf_tracts.merge(sf_acs_data, on="GEOID", how="left")
     updated_sf_tracts.to_file(MERGED_SF_TRACTS_SHP)
 
     return sf_acs_data
@@ -149,4 +149,4 @@ def add_sf_tract_data():
 if __name__ == "__main__":
     join_acs_data()
     create_sf_shapefiles()
-    add_sf_tract_data()  
+    add_sf_tract_data()
