@@ -16,8 +16,8 @@ RENT_PATH = "raw-data/census/acs_sf_median_rent_2020_24.csv"
 HH_INC_PATH = "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
 RACE_PATH = "raw-data/census/acs_sf_race_2020_24.csv"
 
-SF_TRACTS_SHP = "clean-data/sf_shapefiles/sf_tracts.shp"
 SF_ACS_JOIN = "clean-data/census_acs_join.csv"
+SF_TRACTS_SHP = "clean-data/sf_shapefiles/sf_tracts.shp"
 MERGED_SF_TRACTS_SHP = "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
 
 POP_ID = "AUO6E001"
@@ -175,15 +175,15 @@ def visualize_sf_tracts():
     """
     Visualize SF tracts on a map
     """
-    sf_tracts = gpd.read_file("clean-data/sf_tracts_shapefiles/sf_tracts.shp")
+    sf_tracts = gpd.read_file(MERGED_SF_TRACTS_SHP)
     sf_tracts.plot()
     plt.show()
 
 
 if __name__ == "__main__":
-    join_acs_data()
-    create_sf_shapefiles()
-    add_sf_tract_data()
-    # visualize_sf_tracts
+    # join_acs_data()
+    # create_sf_shapefiles()
+    # add_sf_tract_data()
+    visualize_sf_tracts()
     
 
