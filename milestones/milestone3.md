@@ -3,7 +3,7 @@
 ## A repository with an appropriate project layout.
 - Updated repository to have a src directory which contains all our source codes, where each file serves a different function (e.g., get_data.py to extract non-bulk data, process_data.py to clean and merge all data, etc.)
 - Note: Code in process_zori.py will be moved to process_data.py -- weighting the Zillow data by census tract is still a work in progress
-- Other directories include raw-data and clean-data, which differentiate our raw data files from our processed data files
+- Other directories include raw-data and clean-data, which differentiate our raw data files from our processed data files, as well as tests
 
 
 ## Working data import code for at least one of your sources.
@@ -11,14 +11,14 @@
 - Wrote code to access evictions API
 - Wrote code to scrape shelter waitlist (archived due to lack of data availability for the full period of analysis)
 - Refer to get_data.py for code that extracts non-bulk data
-- Wrote code to standardize and clean the 311 cases and encampments and subsequently match files
 
 
 ## An initial draft of data reconciliation/cleaning process.
 - Cleaned data for 311 cases, ZORI, encampments, census and ACS; imputed missing/odd data for census (refer to process_data.py for code)
 - Imputed missing/odd data for ZORI, extracted necessary data and converted to csv for HUD crosswalks, and now working on weighting the data to get tract-specific median rent estimates (refer to work in progress process_zori.py for code)
 - Started reconciling data by joining ACS data to the respective census tracts in the shapefiles (refer to process_data.py for code) and wrote code to match point data to census tracts via quadtrees (refer to quadtree.py for code)
-- We began matching 311 cases to specific encampments by neighborhood, month, and year. The goal is to understand how 311 reports typically cluster around an encampment and then use unmatched 311 reports to improve our estimates of homelessness.
+- Started matching 311 cases to specific encampments by neighborhood, month, and year. The goal is to understand how 311 reports typically cluster around an encampment and then use unmatched 311 reports to improve our estimates of homelessness.
+
 
 ## An initial draft of the final visualization/simulation/etc. that may be using mock data at this point.
 - Currently created initial plots of SF tracts
