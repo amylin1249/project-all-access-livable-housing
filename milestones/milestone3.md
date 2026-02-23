@@ -9,12 +9,13 @@
 - Wrote code to access evictions API
 - Wrote code to scrape shelter waitlist (archived due to lack of data availability for the full period of analysis)
 - Refer to get_data.py for code
+- Wrote code to standardize and clean the 311 cases and encampments and subsequently match files
 
 
 ## An initial draft of data reconciliation/cleaning process.
 - Cleaned data for 311 cases, ZORI, encampments (TBD), census and ACS; imputed missing data for ZORI (refer to process_data.py for code)
 - Started reconciling data by joining ACS data to the respective census tracts in the shapefiles (refer to process_data.py for code) and wrote code to match point data to census tracts via quadtrees (refer to quadtree.py for code)
-
+- We began matching 311 cases to specific encampments by neighborhood, month, and year. The goal is to understand how 311 reports typically cluster around an encampment and then use unmatched 311 reports to improve our estimates of homelessness.
 
 ## An initial draft of the final visualization/simulation/etc. that may be using mock data at this point.
 - Currently created initial plots of SF tracts
