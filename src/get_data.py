@@ -19,7 +19,7 @@ def get_evictions_data() -> list[tuple]:
     datas = resp.json()
 
     eviction_list = []
-
+    current_id = 1
     for data in datas:
         location = data.get("client_location")
         date_raw = data.get("file_date")
@@ -31,8 +31,9 @@ def get_evictions_data() -> list[tuple]:
 
             if lat and lon:
                 # save as tuple
-                record = (float(lat), float(lon), date_raw[:7])
+                record = (int(current_id),float(lat), float(lon), date_raw[:7])
                 eviction_list.append(record)
+                current_id += 1
 
     return eviction_list
 
@@ -45,7 +46,7 @@ def save_evictions_to_csv(data_list, filename="clean-data/evictions_api_data.csv
 
     with open(filename, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["lat", "lon", "year_month"])
+        writer.writerow(["ID","lat", "lon", "year_month"])
         writer.writerows(data_list)
 
 
