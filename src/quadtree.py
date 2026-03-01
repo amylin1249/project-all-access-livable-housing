@@ -1,7 +1,13 @@
 from typing import NamedTuple
 from shapely.geometry import Polygon, box, Point
-import pathlib
+from pathlib import Path
 import shapefile
+
+
+MERGED_SF_TRACTS_SHP = (
+    Path(__file__).parent.parent
+    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+)
 
 
 class Location(NamedTuple):
@@ -22,7 +28,7 @@ class Tract(NamedTuple):
     polygon: Polygon
 
 
-def load_shapefiles(path: pathlib.Path) -> list[Tract]:
+def load_shapefiles(path: Path) -> list[Tract]:
     """
     Extract and parse polygons from census shapefiles.
     """
@@ -230,3 +236,7 @@ def quadtree_spatial_join(
             join_dict[location.id] = tract_id
 
     return join_dict
+
+# if __name__ == "__main__":
+#     quadtree_spatial_join(locations, load_shapefiles(MERGED_SF_TRACTS_SHP))
+# NOTE: We need to standardize format for the locations

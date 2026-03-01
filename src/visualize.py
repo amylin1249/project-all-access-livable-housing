@@ -1,7 +1,6 @@
 import sys
 import shapefile
 import folium
-import pathlib
 import webbrowser
 import pandas as pd
 import geopandas as gpd
@@ -68,7 +67,7 @@ def quick_map(shapefile_data: list[tuple]):
         folium.GeoJson(geom.__geo_interface__).add_to(map)
     map.save("map.html")
     print("created map.html, trying to open browser...")
-    webbrowser.open("file://" + str(pathlib.Path.cwd() / "map.html"))
+    webbrowser.open("file://" + str(Path.cwd() / "map.html"))
 
 
 def reproject_geometries(
