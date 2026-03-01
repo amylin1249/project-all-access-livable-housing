@@ -5,6 +5,7 @@ import pathlib
 import webbrowser
 import pandas as pd
 import geopandas as gpd
+import altair as alt
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -92,6 +93,36 @@ def get_epsg_from_file(filename: str):
     return CRS.from_wkt(prj_text).to_epsg()
 
 
+def create_tract_map(df, start_date: str, end_date: str):
+    """
+    Add docstring
+    """
+    sf_tracts = gpd.read_file(MERGED_SF_TRACTS_SHP)
+    ### TBD ON WHETHER THIS SHOULD BE INSIDE OR OUTSIDE FUNCTION
+
+    filtered_df = (
+        df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
+        .groupby("geoid")
+        .agg(metric_mean=("homelessness", "mean"))
+    )
+
+    chart = (
+        alt.Chart(sf_tracts)
+        .mark_geoshape()
+        .encode(color=alt.Color("metric_mean:Q"))
+        .transform_lookup(
+            lookup="GEOID",
+            from_=alt.LookupData(filtered_df, ("geoid"), ["metric_mean"]),
+        )
+        .project(type="albersUsa")
+        .properties(
+            title=f"Average unsheltered homelessness in SF tracts ({start_date} to {end_date})"
+        )
+    )
+
+    return chart
+
+
 def create_scatterplot():
     """
     Docstring
@@ -135,9 +166,7 @@ TO_PROJ_EPSG = "EPSG:4326"  # WGS 84 global projection
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(
-            "Usage: uv run python visualize.py path/to/shapefile.shp"
-        )
+        print("Usage: uv run python visualize.py path/to/shapefile.shp")
         sys.exit(1)
 
     filepath = Path(__file__).parent.parent / sys.argv[1]
