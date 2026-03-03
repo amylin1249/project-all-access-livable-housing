@@ -116,9 +116,16 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
 
 
 def generate_tidy_csv(rent_by_tract):
-    # This doesn't work here
-    # df = pd.DataFrame.from_dict(rent_by_tract, orient='columns')
-    # df.to_csv('FINAL-DATA.csv')
+    data = []
+    for date, tract_rent in rent_by_tract.items():
+        for tract, median_rent in tract_rent.items():
+            dict = {}
+            dict["date"] = date
+            dict["tract"] = tract
+            dict["median_rent"] = median_rent
+            data.append(dict)
+    df = pd.DataFrame.from_dict(data)
+    df.to_csv('clean-data/consolidated_data.csv', index = False)
 
 
 if __name__ == "__main__":

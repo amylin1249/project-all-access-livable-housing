@@ -29,7 +29,7 @@ REPORT_PATH = (
     Path(__file__).parent.parent / "raw-data"/ "311_Cases_vF.csv"
 )
 ENCAMP_PATH = (
-      Path(__file__).parent.parent / "raw-data"/ "Historical Tent Counts.xlsx"
+      Path(__file__).parent.parent / "raw-data"/ "encampments_counts.xlsx"
 )
 
 HH_INC_PATH = (
