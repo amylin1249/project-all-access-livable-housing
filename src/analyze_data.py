@@ -115,8 +115,14 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
     return rent_by_tract
 
 
+def generate_tidy_csv(rent_by_tract):
+    # This doesn't work here
+    # df = pd.DataFrame.from_dict(rent_by_tract, orient='columns')
+    # df.to_csv('FINAL-DATA.csv')
+
+
 if __name__ == "__main__":
     rent_by_zip = generate_rent_by_zip_dict()
     crosswalks = generate_crosswalks_dict()
     rent_by_tract = weight_to_census_tract(crosswalks, rent_by_zip)
-    print(rent_by_tract)
+    generate_tidy_csv(rent_by_tract)
