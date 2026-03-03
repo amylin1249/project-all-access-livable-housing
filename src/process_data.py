@@ -26,7 +26,7 @@ RENT_PATH = (
 )
 
 REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data"/ "311_Cases_vF.csv"
+    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
 )
 ENCAMP_PATH = (
       Path(__file__).parent.parent / "raw-data"/ "encampments_counts.xlsx"
