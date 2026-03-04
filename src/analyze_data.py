@@ -123,7 +123,7 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
     return rent_by_tract
 
 
-def encampments_by_tract(df):
+def get_encampments_by_tract(df):
     """
     Add docstring
     """
@@ -133,7 +133,7 @@ def encampments_by_tract(df):
     )
     ### I think this column "date" should be added under clean_encampment() in process_data.py instead?
 
-    df.groupby(["geoid", "date"], as_index=False).agg(
+    return df.groupby(["geoid", "date"], as_index=False).agg(
         {
             "tents": "sum",
             "structures": "sum",
@@ -141,12 +141,24 @@ def encampments_by_tract(df):
         }
     )
 
-    df = df[["geoid", "date", "tents", "structures", "vehicles"]]
 
-    return df
+def get_311_calls_by_tract(df):
+    """
+    Add docstring
+    """
+    df["geoid"] = df["geoid"].astype(str).str.zfill(11)
+    df["date"] = (
+        df["year"].astype(str).str.cat(df["month"].astype(str).str.zfill(2), sep="-")
+    )
+    ### I think this column "date" should be added under clean_311() in process_data.py instead?
+
+    return df.groupby(["geoid", "date"]).size().reset_index(name="311_calls")
 
 
 def generate_tidy_csv(rent_by_tract):
+    """
+    Add docstring
+    """
     data = []
     for date, tract_rent in rent_by_tract.items():
         for tract, median_rent in tract_rent.items():
@@ -158,7 +170,7 @@ def generate_tidy_csv(rent_by_tract):
 
     final_df = pd.DataFrame(data)
 
-    # merge eviction data
+    # Merge eviction data
     eviction_records = calculate_eviction_rate(eviction_df, acs_df)
     df_evic_list = pd.DataFrame(eviction_records)
 
@@ -173,8 +185,14 @@ def generate_tidy_csv(rent_by_tract):
     final_df["eviction_rate"] = final_df["eviction_rate"].fillna(0)
     final_df = final_df.drop(columns=["year_mon", "geoid"])
 
-    # Merge encampments data with rent data
-    encampments_df = encampments_by_tract(ENCAMPMENT_DF)
+    # Merge 311 call data
+    encampment_reports_df = get_311_calls_by_tract(ENCAMPMENT_REPORT_DF)
+    encampment_reports_df = encampment_reports_df.rename(columns={"geoid": "tract"})
+
+    final_df = pd.merge(final_df, encampment_reports_df, on=["date", "tract"], how="left")
+
+    # Merge encampments data
+    encampments_df = get_encampments_by_tract(ENCAMPMENT_DF)
     encampments_df = encampments_df.rename(columns={"geoid": "tract"})
 
     final_df = pd.merge(final_df, encampments_df, on=["date", "tract"], how="left")
@@ -191,14 +209,6 @@ def generate_tidy_csv(rent_by_tract):
 
 
 if __name__ == "__main__":
-    TENTS_EST = 1.1
-    STRUCTURES_EST = 1.1
-    VEHICLES_EST = 2.1
-
-    eviction_df = pd.read_csv("clean-data/evictions_api_data_tracts.csv")
-    acs_df = pd.read_csv("clean-data/census_acs_join.csv")
-    ENCAMPMENT_DF = pd.read_csv("clean-data/encampment_tracts.csv")
-
     rent_by_zip = generate_rent_by_zip_dict()
     crosswalks = generate_crosswalks_dict()
     rent_by_tract = weight_to_census_tract(crosswalks, rent_by_zip)
