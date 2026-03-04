@@ -115,7 +115,7 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
     return rent_by_tract
 
 
-def generate_tidy_csv(rent_by_tract):
+def generate_tidy_csv(rent_by_tract,eviction_df, acs_df):
     data = []
     for date, tract_rent in rent_by_tract.items():
         for tract, median_rent in tract_rent.items():
@@ -124,12 +124,28 @@ def generate_tidy_csv(rent_by_tract):
             dict["tract"] = tract
             dict["median_rent"] = median_rent
             data.append(dict)
-    df = pd.DataFrame.from_dict(data)
-    df.to_csv('clean-data/consolidated_data.csv', index = False)
+
+    final_df = pd.DataFrame(data)
+    eviction_records = calculate_eviction_rate(eviction_df, acs_df)
+    df_evic_list= pd.DataFrame(eviction_records)
+
+    final_df = pd.merge(
+        final_df,
+        df_evic_list[["year_mon", "geoid","total_evictions","eviction_rate"]],
+        left_on=["date","tract"],
+        right_on=["year_mon","geoid"],
+        how="left"
+    )
+    
+    final_df = final_df.drop(columns=['year_mon', 'geoid'])
+    final_df.to_csv('clean-data/consolidated_data.csv', index = False)
+
 
 
 if __name__ == "__main__":
+    eviction_df = pd.read_csv("clean-data/evictions_api_data_tracts.csv")
+    acs_df = pd.read_csv("clean-data/census_acs_join.csv")
     rent_by_zip = generate_rent_by_zip_dict()
     crosswalks = generate_crosswalks_dict()
     rent_by_tract = weight_to_census_tract(crosswalks, rent_by_zip)
-    generate_tidy_csv(rent_by_tract)
+    generate_tidy_csv(rent_by_tract,eviction_df, acs_df)
