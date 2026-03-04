@@ -39,7 +39,7 @@ def calculate_eviction_rate(eviction_df, acs_df):
         acs_df[["TL_GEO_ID", "rent_units"]],
         left_on="geoid",
         right_on="TL_GEO_ID",
-        how="right",
+        how="left",
     )
     # without evict -> fill in 0
     merged["total_evictions"] = merged["total_evictions"].fillna(0)
