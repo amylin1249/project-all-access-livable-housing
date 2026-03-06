@@ -44,7 +44,6 @@ def calculate_eviction_rate(eviction_df, acs_df):
     # without evict -> fill in 0
     merged["geoid"] = merged["TL_GEO_ID"]
     merged["eviction_rate"] = merged["total_evictions"] / merged["rent_units"]
-
     return merged.to_dict(orient="records")
 
 
@@ -83,7 +82,6 @@ def generate_crosswalks_dict():
             crosswalks[row["date"]][row["zip"]].append((row["tract"], row["res_ratio"]))
 
     # Fill in missing months (e.g., March 2020 --> Jan 2020, Feb 2020, and March 2020)
-    ### TECHNICALLY COULD INTERPOLATE? BUT SEEMS UNNECESSARY
     for year in range(2020, 2025):
         for month in range(1, 13):
             current_date = f"{year}-{month:02}"
@@ -199,6 +197,9 @@ def generate_tidy_csv():
     # Remove unnecessary columns
     tidy_df = tidy_df.drop(columns=["year_mon", "geoid"])
 
+    # Fill census tracts with no evictions as eviction rate = 0
+    tidy_df["eviction_rate"] = tidy_df["eviction_rate"].fillna(0)
+
     # Merge 311 call data
     encampment_reports_df = get_311_calls_by_tract(ENCAMPMENT_REPORT_DF)
     encampment_reports_df = encampment_reports_df.rename(columns={"geoid": "tract"})
@@ -256,12 +257,13 @@ def generate_tidy_csv():
         ["tents", "structures", "vehicles"]
     ].fillna(0)
 
-    # Calculate weighted estimate of homelessness based on encampment types (rounded)
+    # Calculate weighted estimate of homelessness based on encampment types
     tidy_df["estimate"] = (
         tidy_df["tents"] * TENTS_EST
         + tidy_df["structures"] * STRUCTURES_EST
         + tidy_df["vehicles"] * VEHICLES_EST
-    ).round(0)
+    )
+    # .round(0)
 
     # # Round median rent to whole numbers
     # final_df["median_rent"] = final_df["median_rent"].round(0).astype(int)
@@ -273,4 +275,4 @@ def generate_tidy_csv():
 
 
 if __name__ == "__main__":
-    tidy_df = generate_tidy_csv()
+    generate_tidy_csv()
