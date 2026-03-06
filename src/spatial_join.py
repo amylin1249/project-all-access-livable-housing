@@ -333,16 +333,16 @@ def add_encampments_tracts_csv(
 if __name__ == "__main__":
     join_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS)
 
-    ### THESE WILL BE REMOVED ONCE ENCAMPMENTS AND REPORTS CSVS ARE CREATED
-    # tracts_shp = load_shapefiles(MERGED_SF_TRACTS_SHP)
+    ## THESE WILL BE REMOVED ONCE ENCAMPMENTS AND REPORTS CSVS ARE CREATED
+    tracts_shp = load_shapefiles(MERGED_SF_TRACTS_SHP)
 
-    # clean_311 = clean_311()
-    # add_encampments_tracts_csv(
-    #     clean_311,
-    #     ENCAMPMENT_REPORT_TRACTS,
-    #     quadtree_spatial_join(clean_311, tracts_shp),
-    #     ENCAMPMENT_REPORT_ISSUES,
-    # )
+    clean_311 = clean_311()
+    add_encampments_tracts_csv(
+        clean_311,
+        ENCAMPMENT_REPORT_TRACTS,
+        quadtree_spatial_join(clean_311, tracts_shp),
+        ENCAMPMENT_REPORT_ISSUES,
+    )
 
     # clean_encampment = clean_encampment()
     # add_encampments_tracts_csv(
