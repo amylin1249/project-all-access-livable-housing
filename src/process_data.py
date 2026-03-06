@@ -3,10 +3,7 @@ import sys
 import pandas as pd
 import numpy as np
 import geopandas as gpd
-import jellyfish
-from typing import NamedTuple
 from pathlib import Path
-from openpyxl import load_workbook
 from datetime import datetime
 from datatypes import (
     SF_CENSUS_PATH,
@@ -16,8 +13,6 @@ from datatypes import (
     HH_INC_PATH,
     RACE_PATH,
     RENTER_UNITS_PATH,
-    REPORT_PATH,
-    ENCAMP_PATH,
     SF_ACS_JOIN,
     SF_TRACTS_SHP,
     MERGED_SF_TRACTS_SHP,
@@ -29,67 +24,8 @@ from datatypes import (
 )
 
 
-REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
-)
-ENCAMP_PATH = (
-      Path(__file__).parent.parent / "raw-data"/ "encampment_counts.xlsx"
-)
+EXCLUDE_GEOID = "06075980401"
 
-HH_INC_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
-)
-RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
-RENTER_UNITS_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
-
-SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
-SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
-MERGED_SF_TRACTS_SHP = (
-    Path(__file__).parent.parent
-    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
-)
-
-POP_ID = "AUO6E001"
-RENT_ID = "AUWGE001"
-HH_INC_ID = "AURUE001"
-WHITE_POP_ID = "AUO7E002"
-RENTER_UNITS_ID = "AUUEE003"
-
-EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
-
-class Encampment(NamedTuple):
-    ### unique  encampmemnt id per quarter
-    id: int
-    tents: int
-    structures: int
-    vehicles: int
-
-    year: int
-    month: int
-    date_time: datetime
-    lat: float
-    lon: float
-    neighborhood: str
-
-
-class EncampmentReport(NamedTuple):
-    id: int
-    year: int
-    month: int
-    address: str
-    lat: float
-    lon: float
-  
-
-
-def rate(score):
-    if score >= 0.95:
-        return "high"
-    if score < 0.95 and score >= 0.80:
-        return "medium"
-    return "low"
-
-### LILY CLEANING PROCESS ###
 
 STOPWORDS = [
     "st",
@@ -154,12 +90,12 @@ STOPWORDS = [
 PUNCTUATION = ".,?-#/()[]"
 
 
-def clean_parenthesis(phrase):
+def clean_parenthesis(phrase: str) -> str:
     """
     This function takes a phrase and removes any parenthesized portion.
 
     Parameters:
-        * phrase: a string representing a phrase
+        phrase: a string representing a phrase
 
     Returns:
         A string representing the phrase with parenthesized portion removed.
@@ -180,6 +116,9 @@ def clean_parenthesis(phrase):
 
 
 def clean_address(address):
+    """
+    ADD DOCSTRING
+    """
     address = address.lower()
     address = address.replace("i poi", "")
     address = clean_parenthesis(address)
@@ -189,9 +128,11 @@ def clean_address(address):
     cleaned_list = [word for word in cleaned_list if word not in STOPWORDS]
     return " ".join(cleaned_list)
 
-### AMY INGESTION AND APPLICATION OF CLEANING PROCESS ###
 
 def generate_311_csv():
+    """
+    ADD DOCSTRING
+    """
     # Load raw data
     df = pd.read_csv("raw-data/311_cases.csv")
 
@@ -233,8 +174,11 @@ def generate_311_csv():
 
     df.to_csv("clean-data/clean_311_data.csv", index=False)
 
-### Clean encampments ###
+
 def generate_encampments_csv():
+    """
+    ADD DOCSTRING
+    """
     # Top row (row 0) is not a real header row
     df = pd.read_excel("raw-data/encampment_counts.xlsx", header=1)
 
@@ -288,14 +232,6 @@ def generate_encampments_csv():
     df.to_csv("clean-data/clean_encampments_data.csv", index=False)
 
 
-
-### Bounding box
-### neighborhood bound
-# ### For each encampment, create a bounding box for each encampmemnt
-### use the timeit library
-### timeit helpful to see which functions are taking the longest
-
-
 def process_acs_data():
     """
     Load the data from the ACS files saved, impute negative or zero values in
@@ -339,11 +275,15 @@ def process_acs_data():
         joined_df = pd.merge(joined_df, df, on="TL_GEO_ID", how="left")
 
     # Rename population, race, rent, income, and renter units column names
-    joined_df = joined_df.rename(columns={POP_ID: "population",
-                                          WHITE_POP_ID: "white_pop",
-                                          RENT_ID: "med_rent",
-                                          HH_INC_ID: "med_hh_inc",
-                                          RENTER_UNITS_ID: "rent_units"})
+    joined_df = joined_df.rename(
+        columns={
+            POP_ID: "population",
+            WHITE_POP_ID: "white_pop",
+            RENT_ID: "med_rent",
+            HH_INC_ID: "med_hh_inc",
+            RENTER_UNITS_ID: "rent_units",
+        }
+    )
 
     # Add calculation of percentage of white population per tract as a new column
     joined_df["white_pct"] = np.where(
