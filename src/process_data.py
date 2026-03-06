@@ -25,6 +25,8 @@ from datatypes import (
     HH_INC_ID,
     WHITE_POP_ID,
     RENTER_UNITS_ID,
+    REPORT_PATH,
+    ENCAMP_PATH
 )
 
 
@@ -172,6 +174,9 @@ def generate_311_csv():
     # Drop address as it's no longer needed after this point
     df = df.drop(columns=["address"])
 
+    # Drop observations where lat/lon = 0
+    df = df[(df['lat'] != 0) & (df['lon'] != 0)]
+
     # Reorder columns for readability
     df = df.reindex(columns=["id", "date", "lat", "lon"])
 
@@ -251,7 +256,7 @@ def get_sf_geoid() -> list[str]:
         reader = csv.DictReader(f)
         for row in reader:
             geoid = row["geoid"]
-            if geoid != EXCLUDE_GEOID:
+            if geoid != EXCLUDE_GEOIDS:
                 sf_geoid.append(geoid)
 
     return sf_geoid
@@ -317,6 +322,28 @@ def process_acs_data():
     joined_df = joined_df[joined_df["TL_GEO_ID"].isin(get_sf_geoid())]
 
     joined_df.to_csv(SF_ACS_JOIN, index=False)
+
+
+def get_sf_geoid() -> list[str]:
+    """
+    Extract the list of SF census tract GeoIDs based on the list of 2020 census
+    tracts from DataSF Open Data Portal.
+
+    Returns:
+        List of SF census tract GeoIDs
+    """
+    sf_geoid = []
+
+    csv.field_size_limit(sys.maxsize)
+
+    with open(SF_CENSUS_PATH) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            geoid = row["geoid"]
+            if geoid != EXCLUDE_GEOIDS:
+                sf_geoid.append(geoid)
+
+    return sf_geoid
 
 
 def create_sf_shapefiles():
