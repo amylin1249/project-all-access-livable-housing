@@ -29,31 +29,7 @@ from datatypes import (
 )
 
 
-REPORT_PATH = (
-    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
-)
-ENCAMP_PATH = (
-      Path(__file__).parent.parent / "raw-data"/ "encampment_counts.xlsx"
-)
 
-HH_INC_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
-)
-RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
-RENTER_UNITS_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
-
-SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
-SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
-MERGED_SF_TRACTS_SHP = (
-    Path(__file__).parent.parent
-    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
-)
-
-POP_ID = "AUO6E001"
-RENT_ID = "AUWGE001"
-HH_INC_ID = "AURUE001"
-WHITE_POP_ID = "AUO7E002"
-RENTER_UNITS_ID = "AUUEE003"
 
 EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
 
