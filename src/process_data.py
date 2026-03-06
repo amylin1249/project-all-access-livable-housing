@@ -24,8 +24,43 @@ from datatypes import (
 )
 
 
-EXCLUDE_GEOID = "06075980401"
 
+
+EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
+
+class Encampment(NamedTuple):
+    ### unique  encampmemnt id per quarter
+    id: int
+    tents: int
+    structures: int
+    vehicles: int
+
+    year: int
+    month: int
+    date_time: datetime
+    lat: float
+    lon: float
+    neighborhood: str
+
+
+class EncampmentReport(NamedTuple):
+    id: int
+    year: int
+    month: int
+    address: str
+    lat: float
+    lon: float
+  
+
+
+def rate(score):
+    if score >= 0.95:
+        return "high"
+    if score < 0.95 and score >= 0.80:
+        return "medium"
+    return "low"
+
+### LILY CLEANING PROCESS ###
 
 STOPWORDS = [
     "st",
