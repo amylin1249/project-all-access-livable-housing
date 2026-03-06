@@ -29,8 +29,67 @@ from datatypes import (
 )
 
 
-EXCLUDE_GEOID = "06075980401"
+REPORT_PATH = (
+    Path(__file__).parent.parent / "raw-data"/ "311_cases.csv"
+)
+ENCAMP_PATH = (
+      Path(__file__).parent.parent / "raw-data"/ "encampment_counts.xlsx"
+)
 
+HH_INC_PATH = (
+    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
+)
+RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
+RENTER_UNITS_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
+
+SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
+SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
+MERGED_SF_TRACTS_SHP = (
+    Path(__file__).parent.parent
+    / "clean-data/merged_sf_shapefiles/merged_sf_tracts.shp"
+)
+
+POP_ID = "AUO6E001"
+RENT_ID = "AUWGE001"
+HH_INC_ID = "AURUE001"
+WHITE_POP_ID = "AUO7E002"
+RENTER_UNITS_ID = "AUUEE003"
+
+EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
+
+class Encampment(NamedTuple):
+    ### unique  encampmemnt id per quarter
+    id: int
+    tents: int
+    structures: int
+    vehicles: int
+
+    year: int
+    month: int
+    date_time: datetime
+    lat: float
+    lon: float
+    neighborhood: str
+
+
+class EncampmentReport(NamedTuple):
+    id: int
+    year: int
+    month: int
+    address: str
+    lat: float
+    lon: float
+  
+
+
+def rate(score):
+    if score >= 0.95:
+        return "high"
+    if score < 0.95 and score >= 0.80:
+        return "medium"
+    return "low"
+
+### LILY CLEANING PROCESS ###
 
 STOPWORDS = [
     "st",
@@ -130,7 +189,51 @@ def clean_address(address):
     cleaned_list = [word for word in cleaned_list if word not in STOPWORDS]
     return " ".join(cleaned_list)
 
+### AMY INGESTION AND APPLICATION OF CLEANING PROCESS ###
 
+def generate_311_csv():
+    # Load raw data
+    df = pd.read_csv("raw-data/311_cases.csv")
+
+    # Keep only necessary columns
+    df = df[["Opened", "Address", "Latitude", "Longitude"]]
+
+    # Rename columns for ease of spatial join
+    df = df.rename(
+        columns={
+            "Opened": "date",
+            "Address": "address",
+            "Latitude": "lat",
+            "Longitude": "lon",
+        }
+    )
+
+    # Convert date to standardized format: YYYY-MM
+    df["date"] = pd.to_datetime(df["date"])
+    df["date"] = df["date"].dt.strftime("%Y-%m")
+
+    # Filter for years of interest: 2020-2024
+    df = df[df["date"].between("2020-01-01", "2024-12-31")]
+
+    # Add id column
+    df["id"] = range(1, len(df) + 1)
+
+    # Clean addresses
+    df["address"] = df["address"].apply(clean_address)
+
+    # De-dupe by cleaned address and month (keep only one row per cleaned
+    # address per month)
+    df = df.drop_duplicates(subset=["address", "date"], keep="first")
+
+    # Drop address as it's no longer needed after this point
+    df = df.drop(columns=["address"])
+
+    # Reorder columns for readability
+    df = df.reindex(columns=["id", "date", "lat", "lon"])
+
+    df.to_csv("clean-data/clean_311_data.csv", index=False)
+
+### Clean encampments ###
 def generate_encampments_csv():
     # Top row (row 0) is not a real header row
     df = pd.read_excel("raw-data/encampment_counts.xlsx", header=1)
@@ -184,48 +287,6 @@ def generate_encampments_csv():
 
     df.to_csv("clean-data/clean_encampments_data.csv", index=False)
 
-
-def generate_311_csv():
-    # Load raw data
-    df = pd.read_csv("raw-data/311_cases.csv")
-
-    # Keep only necessary columns
-    df = df[["Opened", "Address", "Latitude", "Longitude"]]
-
-    # Rename columns for ease of spatial join
-    df = df.rename(
-        columns={
-            "Opened": "date",
-            "Address": "address",
-            "Latitude": "lat",
-            "Longitude": "lon",
-        }
-    )
-
-    # Convert date to standardized format: YYYY-MM
-    df["date"] = pd.to_datetime(df["date"])
-    df["date"] = df["date"].dt.strftime("%Y-%m")
-
-    # Filter for years of interest: 2020-2024
-    df = df[df["date"].between("2020-01-01", "2024-12-31")]
-
-    # Add id column
-    df["id"] = range(1, len(df) + 1)
-
-    # Clean addresses
-    df["address"] = df["address"].apply(clean_address)
-
-    # De-dupe by cleaned address and month (keep only one row per cleaned
-    # address per month)
-    df = df.drop_duplicates(subset=["address", "date"], keep="first")
-
-    # Drop address as it's no longer needed after this point
-    df = df.drop(columns=["address"])
-
-    # Reorder columns for readability
-    df = df.reindex(columns=["id", "date", "lat", "lon"])
-
-    df.to_csv("clean-data/clean_311_data.csv", index=False)
 
 
 ### Bounding box
@@ -467,10 +528,8 @@ def generate_crosswalks_csv():
 
 
 if __name__ == "__main__":
-    generate_encampments_csv()
-    generate_311_csv()
-    # process_acs_data()
-    # create_sf_shapefiles()
-    # add_sf_tract_data()
-    # generate_zori_csv()
-    # generate_crosswalks_csv()
+    process_acs_data()
+    create_sf_shapefiles()
+    add_sf_tract_data()
+    generate_zori_csv()
+    generate_crosswalks_csv()
