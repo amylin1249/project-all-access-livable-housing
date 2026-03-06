@@ -1,6 +1,5 @@
-import pytest
-from src.get_data import get_evictions_data
 from datetime import datetime
+from src.get_data import get_evictions_data
 
 
 def test_api_fetch():
@@ -27,4 +26,4 @@ def test_api_year_in_range():
         assert 2020 <= year <= 2024
 
 
-# def test_quadtree_
+
