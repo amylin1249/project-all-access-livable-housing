@@ -46,10 +46,17 @@ def test_process_acs_impute_neg_income():
 
 
 def test_process_acs_calc_white_pct():
-    MEAN_POS_INC = 146050
-
     acs_df = pd.read_csv(SF_ACS_JOIN)
     acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
 
-    # Test that all tracts which originally had negative income values have been imputed
-    assert acs_df[acs_df["TL_GEO_ID"] == "06075012403"]["med_hh_inc"] == MEAN_POS_INC
+    # Test calculations of white_pct of select tracts by dividing white_pop by population
+    assert acs_df[acs_df["TL_GEO_ID"] == "06075010702"]["white_pct"] == 423 / 1398
+    assert acs_df[acs_df["TL_GEO_ID"] == "06075012902"]["white_pct"] == 1810 / 2589
+    assert acs_df[acs_df["TL_GEO_ID"] == "06075026201"]["white_pct"] == 366 / 3856
+
+
+### Add tests on ZORI
+
+
+
+
