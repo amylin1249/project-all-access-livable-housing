@@ -256,7 +256,7 @@ def get_sf_geoid() -> list[str]:
         reader = csv.DictReader(f)
         for row in reader:
             geoid = row["geoid"]
-            if geoid != EXCLUDE_GEOIDS:
+            if geoid != EXCLUDE_GEOID:
                 sf_geoid.append(geoid)
 
     return sf_geoid
