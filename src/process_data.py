@@ -21,7 +21,8 @@ from datatypes import (
     HH_INC_ID,
     WHITE_POP_ID,
     RENTER_UNITS_ID,
-    REPORT_PATH
+    REPORT_PATH,
+    ENCAMP_PATH
 )
 
 
@@ -195,7 +196,7 @@ def generate_encampments_csv():
     ADD DOCSTRING
     """
     # Top row (row 0) is not a real header row
-    df = pd.read_excel("raw-data/encampment_counts.xlsx", header=1)
+    df = pd.read_excel(ENCAMP_PATH, header=1)
 
     # Keep only necessary columns
     df = df[
@@ -247,6 +248,28 @@ def generate_encampments_csv():
     df.to_csv("clean-data/clean_encampments_data.csv", index=False)
 
 
+def get_sf_geoid() -> list[str]:
+    """
+    Extract the list of SF census tract GeoIDs based on the list of 2020 census
+    tracts from DataSF Open Data Portal, removing any tracts to be excluded.
+
+    Returns:
+        List of filtered SF census tract GeoIDs.
+    """
+    sf_geoid = []
+
+    csv.field_size_limit(sys.maxsize)
+
+    with open(SF_CENSUS_PATH) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            geoid = row["geoid"]
+            if geoid != EXCLUDE_GEOIDS:
+                sf_geoid.append(geoid)
+
+    return sf_geoid
+
+
 def process_acs_data():
     """
     Load the data from the ACS files saved, impute negative or zero values in
@@ -276,13 +299,13 @@ def process_acs_data():
         dtype={"TL_GEO_ID": "str"},
     )
 
-    # Impute negative or zero values (i.e., missing) in rent and household income
+    # Impute negative values (i.e., missing) in rent and household income
     # dataframes with the mean of their positive values
     mean_rent = round(rent_df.loc[rent_df[RENT_ID] > 0, RENT_ID].mean())
-    rent_df.loc[rent_df[RENT_ID] <= 0, RENT_ID] = mean_rent
+    rent_df.loc[rent_df[RENT_ID] < 0, RENT_ID] = mean_rent
 
     mean_hh_inc = round(hh_inc_df.loc[hh_inc_df[HH_INC_ID] > 0, HH_INC_ID].mean())
-    hh_inc_df.loc[hh_inc_df[HH_INC_ID] <= 0, HH_INC_ID] = mean_hh_inc
+    hh_inc_df.loc[hh_inc_df[HH_INC_ID] < 0, HH_INC_ID] = mean_hh_inc
 
     # Merge individual dataframes based on GEO_ID
     joined_df = pop_df
@@ -304,6 +327,9 @@ def process_acs_data():
     joined_df["white_pct"] = np.where(
         joined_df["population"] > 0, joined_df["white_pop"] / joined_df["population"], 0
     )
+
+    # Filter tract IDs only for those in the list of filtered SF census tracts
+    joined_df = joined_df[joined_df["TL_GEO_ID"].isin(get_sf_geoid())]
 
     joined_df.to_csv(SF_ACS_JOIN, index=False)
 
