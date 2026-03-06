@@ -109,8 +109,9 @@ def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name
     chart = (
         alt.Chart(sf_tracts)
         .mark_geoshape()
-        .encode(color=alt.Color("metric:Q"))
-        .transform_lookup(
+        .encode(
+            color=alt.Color("metric:Q"),
+        ).transform_lookup(
             lookup="GEOID",
             from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
         )
