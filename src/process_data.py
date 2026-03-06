@@ -21,36 +21,13 @@ from datatypes import (
     HH_INC_ID,
     WHITE_POP_ID,
     RENTER_UNITS_ID,
+    REPORT_PATH
 )
 
 
 
 
 EXCLUDE_GEOIDS = ["06075980401", "06075980200"]
-
-class Encampment(NamedTuple):
-    ### unique  encampmemnt id per quarter
-    id: int
-    tents: int
-    structures: int
-    vehicles: int
-
-    year: int
-    month: int
-    date_time: datetime
-    lat: float
-    lon: float
-    neighborhood: str
-
-
-class EncampmentReport(NamedTuple):
-    id: int
-    year: int
-    month: int
-    address: str
-    lat: float
-    lon: float
-  
 
 
 def rate(score):
@@ -169,7 +146,7 @@ def generate_311_csv():
     ADD DOCSTRING
     """
     # Load raw data
-    df = pd.read_csv("raw-data/311_cases.csv")
+    df = pd.read_csv(REPORT_PATH)
 
     # Keep only necessary columns
     df = df[["Opened", "Address", "Latitude", "Longitude"]]
@@ -203,6 +180,9 @@ def generate_311_csv():
 
     # Drop address as it's no longer needed after this point
     df = df.drop(columns=["address"])
+
+    # Drop observations where lat/lon = 0
+    df = df[(df['lat'] != 0) & (df['lon'] != 0)]
 
     # Reorder columns for readability
     df = df.reindex(columns=["id", "date", "lat", "lon"])
@@ -344,7 +324,7 @@ def get_sf_geoid() -> list[str]:
         reader = csv.DictReader(f)
         for row in reader:
             geoid = row["geoid"]
-            if geoid != EXCLUDE_GEOID:
+            if geoid != EXCLUDE_GEOIDS:
                 sf_geoid.append(geoid)
 
     return sf_geoid
