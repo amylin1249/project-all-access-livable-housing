@@ -10,9 +10,9 @@ from datatypes import (
     SF_EVICTIONS,
     CLEAN_ENCAMP,
     CLEAN_311,
-    SF_EVICTIONS_TRACTS,
-    ENCAMPMENT_TRACTS,
-    ENCAMPMENT_REPORT_TRACTS,
+    JOINED_EVICTIONS_TRACTS,
+    JOINED_ENCAMP_TRACTS,
+    JOINED_311_TRACTS,
 )
 
 
@@ -291,6 +291,6 @@ def join_tracts_csv(source_csv: Path, dest_csv: Path):
 
 
 if __name__ == "__main__":
-    # join_tracts_csv(SF_EVICTIONS, SF_EVICTIONS_TRACTS)
-    # join_tracts_csv(CLEAN_ENCAMP, ENCAMPMENT_TRACTS)
-    join_tracts_csv(CLEAN_311, ENCAMPMENT_REPORT_TRACTS)
+    # join_tracts_csv(SF_EVICTIONS, JOINED_EVICTIONS_TRACTS)
+    # join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
+    join_tracts_csv(CLEAN_311, JOINED_311_TRACTS)

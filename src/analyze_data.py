@@ -3,17 +3,17 @@ import csv
 from datetime import datetime
 
 from datatypes import (
-    SF_EVICTIONS_TRACTS,
+    JOINED_EVICTIONS_TRACTS,
     SF_ACS_JOIN,
-    ENCAMPMENT_TRACTS,
-    ENCAMPMENT_REPORT_TRACTS,
-    CONSOLIDATED
+    JOINED_ENCAMP_TRACTS,
+    JOINED_311_TRACTS,
+    MERGED
 )
 
-eviction_df = pd.read_csv(SF_EVICTIONS_TRACTS)
+eviction_df = pd.read_csv(JOINED_EVICTIONS_TRACTS)
 acs_df = pd.read_csv(SF_ACS_JOIN)
-ENCAMPMENT_DF = pd.read_csv(ENCAMPMENT_TRACTS)
-ENCAMPMENT_REPORT_DF = pd.read_csv(ENCAMPMENT_REPORT_TRACTS)
+ENCAMPMENT_DF = pd.read_csv(JOINED_ENCAMP_TRACTS)
+ENCAMPMENT_REPORT_DF = pd.read_csv(JOINED_311_TRACTS)
 
 TENTS_EST = 1.1
 STRUCTURES_EST = 1.1
@@ -278,7 +278,7 @@ def generate_tidy_csv():
     # # Round eviction rate to percentage with one decimal
     # final_df["eviction_rate"] = (final_df["eviction_rate"] * 100).round(1)
 
-    tidy_df.to_csv(CONSOLIDATED, index=False)
+    tidy_df.to_csv(MERGED, index=False)
 
 
 if __name__ == "__main__":

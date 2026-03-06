@@ -32,7 +32,7 @@ REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
 
 
 # Paths to clean evictions, encampment counts, and 311 cases CSV files
-SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
+SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/api_evictions_data.csv"
 CLEAN_ENCAMP = Path(__file__).parent.parent / "clean-data/clean_encampments_data.csv"
 CLEAN_311 = Path(__file__).parent.parent / "clean-data/clean_311_data.csv"
 
@@ -47,15 +47,15 @@ MERGED_SF_TRACTS_SHP = (
 
 
 # Paths to CSV files with point data that have been spatially matched with tracts
-SF_EVICTIONS_TRACTS = (
-    Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
+JOINED_EVICTIONS_TRACTS = (
+    Path(__file__).parent.parent / "clean-data/joined_evictions_tracts.csv"
 )
-ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
-ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/311_tracts.csv"
+JOINED_ENCAMP_TRACTS = Path(__file__).parent.parent / "clean-data/joined_encampment_tracts.csv"
+JOINED_311_TRACTS = Path(__file__).parent.parent / "clean-data/joined_311_tracts.csv"
 
 
 # Path to consolidated data file to be used for analysis and visualization
-CONSOLIDATED = Path(__file__).parent.parent / "clean-data/consolidated_data.csv"
+MERGED = Path(__file__).parent.parent / "clean-data/merged_data.csv"
 
 
 # Column IDs of metrics of interest from raw ACS CSV files

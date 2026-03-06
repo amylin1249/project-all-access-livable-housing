@@ -165,10 +165,10 @@ def create_scatterplot(
         data=filtered_df,
         ax=ax,
     )
-    plt.xlabel("Median monthly rent ($)", fontsize=12)
-    plt.ylabel("Average homelessness counts", fontsize=12)
+    plt.xlabel("Average homelessness counts", fontsize=12)
+    plt.ylabel("Median monthly rent ($)", fontsize=12)
     plt.title(
-        "Average homelessness counts vs. Median rent by tract",
+        "Median rent by tract vs. Average homelessness counts",
         fontsize=14,
         fontweight="bold",
     )
@@ -194,4 +194,4 @@ if __name__ == "__main__":
 
     # visualize_sf_tracts()
     # create_tract_map(CONSOLIDATED, "2020-01", "2024-12", "estimate", "sum")
-    create_scatterplot(CONSOLIDATED, "median_rent", "mean", "estimate", "mean")
+    create_scatterplot(CONSOLIDATED, "estimate", "mean", "median_rent", "mean", )
