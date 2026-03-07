@@ -1,24 +1,24 @@
 from pathlib import Path
 
 # Paths to raw ACS CSV files for the relevant metrics
-POP_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_population_2020_24.csv"
+RAW_ACS_POP = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_population_2020_24.csv"
 )
-RENT_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_rent_2020_24.csv"
+RAW_ACS_RENT = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_median_rent_2020_24.csv"
 )
-HH_INC_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_median_hh_income_2020_24.csv"
+RAW_ACS_HH_INC = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_median_hh_income_2020_24.csv"
 )
-RACE_PATH = Path(__file__).parent.parent / "raw-data/census/acs_sf_race_2020_24.csv"
-RENTER_UNITS_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/acs_sf_housing_units_2020_24.csv"
+RAW_ACS_RACE = Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_race_2020_24.csv"
+RAW_ACS_RENTER_UNITS = (
+    Path(__file__).parent.parent / "raw-data/census/raw_acs_sf_housing_units_2020_24.csv"
 )
 
 
 # Paths to raw SF census tracts CSV file and California tracts shapefiles
-SF_CENSUS_PATH = (
-    Path(__file__).parent.parent / "raw-data/census/sf_census_tracts_2020.csv"
+RAW_SF_TRACTS = (
+    Path(__file__).parent.parent / "raw-data/census/raw_sf_census_tracts_2020.csv"
 )
 CALI_TRACTS_SHP = (
     Path(__file__).parent.parent
@@ -26,19 +26,24 @@ CALI_TRACTS_SHP = (
 )
 
 
-# Paths to raw encampment counts XLSX and 311 cases CSV
-ENCAMP_PATH = Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
-REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
+# Paths to raw encampment counts XLSX, 311 cases CSV, and Zillow CSV
+RAW_ENCAMP = Path(__file__).parent.parent / "raw-data/raw_encampments_data.xlsx"
+RAW_311 = Path(__file__).parent.parent / "raw-data/raw_311_data.csv"
+RAW_ZILLOW = Path(__file__).parent.parent / "raw-data/raw_zillow_data.csv"
 
+# Path to raw crosswalks XLSX files folder
+RAW_CROSSWALKS = Path(__file__).parent.parent / "raw-data/raw_crosswalks"
 
-# Paths to clean evictions, encampment counts, and 311 cases CSV files
-SF_EVICTIONS = Path(__file__).parent.parent / "clean-data/evictions_api_data.csv"
+# Paths to clean evictions, encampment counts, 311 cases, Zillow, and crosswalks CSV files
+CLEAN_EVICTIONS = Path(__file__).parent.parent / "clean-data/api_evictions_data.csv"
 CLEAN_ENCAMP = Path(__file__).parent.parent / "clean-data/clean_encampments_data.csv"
 CLEAN_311 = Path(__file__).parent.parent / "clean-data/clean_311_data.csv"
+CLEAN_ZILLOW = Path(__file__).parent.parent / "clean-data/clean_311_zillow_data.csv"
+CLEAN_CROSSWALKS = Path(__file__).parent.parent / "clean-data/clean_crosswalks.csv"
 
 
 # Paths to clean census CSV file and tract shapefiles
-SF_ACS_JOIN = Path(__file__).parent.parent / "clean-data/census_acs_join.csv"
+SF_CENSUS_TRACTS = Path(__file__).parent.parent / "clean-data/sf_census_tracts.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
 MERGED_SF_TRACTS_SHP = (
     Path(__file__).parent.parent
@@ -47,20 +52,20 @@ MERGED_SF_TRACTS_SHP = (
 
 
 # Paths to CSV files with point data that have been spatially matched with tracts
-SF_EVICTIONS_TRACTS = (
-    Path(__file__).parent.parent / "clean-data/evictions_api_data_tracts.csv"
+JOINED_EVICTIONS_TRACTS = (
+    Path(__file__).parent.parent / "clean-data/joined_evictions_tracts.csv"
 )
-ENCAMPMENT_TRACTS = Path(__file__).parent.parent / "clean-data/encampment_tracts.csv"
-ENCAMPMENT_REPORT_TRACTS = Path(__file__).parent.parent / "clean-data/311_tracts.csv"
+JOINED_ENCAMP_TRACTS = Path(__file__).parent.parent / "clean-data/joined_encampment_tracts.csv"
+JOINED_311_TRACTS = Path(__file__).parent.parent / "clean-data/joined_311_tracts.csv"
 
 
-# Path to consolidated data file to be used for analysis and visualization
-CONSOLIDATED = Path(__file__).parent.parent / "clean-data/consolidated_data.csv"
+# Path to consolidated/merged data file to be used for analysis and visualization
+MERGED = Path(__file__).parent.parent / "clean-data/merged_data.csv"
 
 
 # Column IDs of metrics of interest from raw ACS CSV files
-POP_ID = "AUO6E001"
-RENT_ID = "AUWGE001"
-HH_INC_ID = "AURUE001"
-WHITE_POP_ID = "AUO7E002"
-RENTER_UNITS_ID = "AUUEE003"
+ACS_POP_ID = "AUO6E001"
+ACS_RENT_ID = "AUWGE001"
+ACS_HH_INC_ID = "AURUE001"
+ACS_WHITE_POP_ID = "AUO7E002"
+ACS_RENTER_UNITS_ID = "AUUEE003"
