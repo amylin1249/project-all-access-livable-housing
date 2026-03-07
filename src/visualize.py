@@ -12,6 +12,9 @@ from pathlib import Path
 from pyproj import Transformer, CRS
 from shapely import geometry
 from shapely.ops import transform
+from dash import Dash, html
+import dash_vega_components as dvc
+
 from datatypes import (
     MERGED_SF_TRACTS_SHP,
     CONSOLIDATED
@@ -98,9 +101,13 @@ def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name
     df = pd.read_csv(source_file)
     sf_tracts = gpd.read_file(MERGED_SF_TRACTS_SHP)
     ### TBD ON WHETHER THIS SHOULD BE INSIDE OR OUTSIDE FUNCTION
-
+    df["tract"] = df["tract"].astype(str).str.zfill(11)
+    df["date"] = pd.to_datetime(df["date"])
+    start_dt = pd.to_datetime(start_date)
+    end_dt = pd.to_datetime(end_date)
+    
     filtered_df = (
-        df[(df["date"] >= start_date) & (df["date"] <= end_date)]
+        df[(df["date"] >= start_dt) & (df["date"] <= end_dt)]
         .groupby("tract")
         .agg(metric=(col_name, agg))
         .reset_index()
@@ -118,7 +125,7 @@ def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name
         .project(type="albersUsa")
         .properties(
             title=f"Unsheltered homelessness in SF tracts ({start_date} to {end_date})"
-        )
+        ).interactive()
     )
 
     return chart
