@@ -21,11 +21,11 @@ import calendar
 
 from datatypes import (
     MERGED_SF_TRACTS_SHP,
-    CONSOLIDATED
+    MERGED
 )
 
 my_chart = create_tract_map(
-    source_file=CONSOLIDATED, 
+    source_file=MERGED, 
     start_date="2020-01", 
     end_date="2024-12", 
     col_name="eviction_rate", 
@@ -119,7 +119,7 @@ app.layout = html.Div([
         html.Div([
             html.H3("Scatter Plot", style={'textAlign': 'center', 'color': '#2c3e50'}),
             html.Hr(),
-            # 나중에 산점도가 들어올 빈 공간 (Placeholder)
+            # Placeholder for scatter
             html.Div(
                 id='scatter-plot-placeholder',
                 children=[
@@ -141,7 +141,7 @@ app.layout = html.Div([
         ], style={'width': '50%', 'padding': '10px', 'marginLeft': '20px'})
 
     ], style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flex-start', 'padding': '20px'})
-
+])
 
 
 @app.callback(
@@ -162,7 +162,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     end= f"{end_year}-{end_month}-{last_day}"
 
     new_chart = create_tract_map(
-        source_file=CONSOLIDATED, 
+        source_file=MERGED, 
         start_date=start, 
         end_date=end, 
         col_name=selected_col, 
