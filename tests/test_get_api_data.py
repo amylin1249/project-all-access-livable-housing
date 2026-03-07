@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.get_data import get_evictions_data
+from src.get_api_data import get_evictions_data
 
 
 def test_api_fetch():
