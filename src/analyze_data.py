@@ -10,10 +10,7 @@ from datatypes import (
     MERGED
 )
 
-eviction_df = pd.read_csv(JOINED_EVICTIONS_TRACTS)
 acs_df = pd.read_csv(SF_ACS_JOIN)
-ENCAMPMENT_DF = pd.read_csv(JOINED_ENCAMP_TRACTS)
-ENCAMPMENT_REPORT_DF = pd.read_csv(JOINED_311_TRACTS)
 
 TENTS_EST = 1.1
 STRUCTURES_EST = 1.1
@@ -25,6 +22,8 @@ def total_evictions_by_tract(eviction_df):
     Combine current evictions data with census tracts
     to get total number of evictions within a tract for a given month
     """
+    evictions_df = pd.read_csv(JOINED_EVICTIONS_TRACTS)
+
     eviction_df["geoid"] = eviction_df["geoid"].astype(str).str.zfill(11)
     group_by_month = eviction_df.groupby(["geoid", "year_mon"])
     total_evic_per_mon = group_by_month.size().reset_index(name="total_evictions")
@@ -137,16 +136,18 @@ def weight_to_census_tract(crosswalks, rent_by_zip):
     return rent_by_tract
 
 
-def get_encampments_by_tract(df):
+def count_encampments_by_tract():
     """
-    Add docstring
-    """
-    df["geoid"] = df["geoid"].astype(str).str.zfill(11)
-    df["date"] = (
-        df["year"].astype(str).str.cat(df["month"].astype(str).str.zfill(2), sep="-")
-    )
-    ### I think this column "date" should be added under clean_encampment() in process_data.py instead?
+    Aggregate number of encampments (tents, structures, vehicles) in each tract
+    and month.
 
+    Returns:
+        A pandas.DataFrame object aggregating the number of encampments by tract
+        and month
+    """
+    df = pd.read_csv(JOINED_ENCAMP_TRACTS)
+    df["geoid"] = df["geoid"].astype(str).str.zfill(11)
+    
     return df.groupby(["geoid", "date"], as_index=False).agg(
         {
             "tents": "sum",
@@ -156,15 +157,16 @@ def get_encampments_by_tract(df):
     )
 
 
-def get_311_calls_by_tract(df):
+def count_311_by_tract():
     """
-    Add docstring
+    Aggregate number of 311 calls in each tract and month.
+
+    Returns:
+        A pandas.DataFrame object aggregating the number of 311 calls by tract
+        and month
     """
+    df = pd.read_csv(JOINED_311_TRACTS)
     df["geoid"] = df["geoid"].astype(str).str.zfill(11)
-    df["date"] = (
-        df["year"].astype(str).str.cat(df["month"].astype(str).str.zfill(2), sep="-")
-    )
-    ### I think this column "date" should be added under clean_311() in process_data.py instead?
 
     return df.groupby(["geoid", "date"]).size().reset_index(name="311_calls")
 
@@ -208,7 +210,7 @@ def generate_tidy_csv():
     tidy_df["eviction_rate"] = tidy_df["eviction_rate"].fillna(0)
 
     # Merge 311 call data
-    encampment_reports_df = get_311_calls_by_tract(ENCAMPMENT_REPORT_DF)
+    encampment_reports_df = count_311_by_tract()
     encampment_reports_df = encampment_reports_df.rename(columns={"geoid": "tract"})
 
     tidy_df = pd.merge(tidy_df, encampment_reports_df, on=["date", "tract"], how="left")
@@ -217,7 +219,7 @@ def generate_tidy_csv():
     tidy_df["311_calls"] = tidy_df["311_calls"].fillna(0)
 
     # Grab encampments data
-    encampments_df = get_encampments_by_tract(ENCAMPMENT_DF)
+    encampments_df = count_encampments_by_tract()
     encampments_df = encampments_df.rename(columns={"geoid": "tract"})
 
     # Interpolate encampments data to go from quarterly to monthly
