@@ -128,11 +128,11 @@ app.layout = html.Div([
                     spec={},
                     style={'width': '100%', 'height': '500px'}
             ),
-        ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}) 
+        ], style={'display': 'flex', 'justifyContent': 'center',"width":"100%","paddingLeft":"50px"}) 
     ], style={
         'width': '60%', 
         'padding': '20px', 'border': '1px solid #ddd', 
-        'borderRadius': '10px', 'backgroundColor': 'white'
+        'borderRadius': '10px', 'backgroundColor': 'white', 'boxSizing': 'border-box'
     }),     
         
         # right : scatter plot
