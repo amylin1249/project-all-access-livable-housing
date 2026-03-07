@@ -199,10 +199,10 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     
     buf = io.BytesIO()
     create_scatterplot(MERGED, "estimate", "mean", selected_col, "mean")
-    plt.savefig(buf, format='png') # 현재 그려진 Seaborn 그림을 버퍼에 저장
-    plt.close() # 메모리 정리
+    plt.savefig(buf, format='png') #Seaborn as png
+    plt.close() # 
     
-    data = base64.b64encode(buf.getbuffer()).decode("utf8") # 이미지로 변환
+    data = base64.b64encode(buf.getbuffer()).decode("utf8") # into img
     new_scatter = f"data:image/png;base64,{data}"
 
     plot_title = f"Median rent by tract vs. Average homelessness counts"
