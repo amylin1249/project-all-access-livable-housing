@@ -43,6 +43,9 @@ CLEAN_CROSSWALKS = Path(__file__).parent.parent / "clean-data/clean_crosswalks.c
 
 
 # Paths to clean census CSV file and tract shapefiles
+SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/sf_shapefiles"
+MERGED_SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles"
+
 SF_CENSUS_TRACTS = Path(__file__).parent.parent / "clean-data/sf_census_tracts.csv"
 SF_TRACTS_SHP = Path(__file__).parent.parent / "clean-data/sf_shapefiles/sf_tracts.shp"
 MERGED_SF_TRACTS_SHP = (

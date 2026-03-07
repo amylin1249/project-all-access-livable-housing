@@ -19,6 +19,8 @@ from datatypes import (
     ACS_RENTER_UNITS_ID,
     SF_CENSUS_TRACTS,
     CALI_TRACTS_SHP,
+    SF_TRACTS_DIR,
+    MERGED_SF_TRACTS_DIR,
     SF_TRACTS_SHP,
     MERGED_SF_TRACTS_SHP,
     RAW_311,
@@ -133,6 +135,9 @@ def create_sf_shapefiles():
     # Filter California tract IDs only for those that are in SF
     sf_tracts = cali_tracts[cali_tracts["GEOID"].isin(get_sf_geoid())]
 
+    if not SF_TRACTS_DIR.exists():
+        SF_TRACTS_DIR.mkdir()
+
     sf_tracts.to_file(SF_TRACTS_SHP)
 
 
@@ -149,6 +154,10 @@ def add_sf_tract_data():
     sf_acs_data.rename(columns={"TL_GEO_ID": "GEOID"}, inplace=True)
 
     updated_sf_tracts = sf_tracts.merge(sf_acs_data, on="GEOID", how="left")
+
+    if not MERGED_SF_TRACTS_DIR.exists():
+        MERGED_SF_TRACTS_DIR.mkdir()
+
     updated_sf_tracts.to_file(MERGED_SF_TRACTS_SHP)
 
 

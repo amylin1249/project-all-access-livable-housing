@@ -3,41 +3,43 @@ import csv
 from datetime import datetime
 
 from datatypes import (
+    SF_CENSUS_TRACTS,
     JOINED_EVICTIONS_TRACTS,
-    SF_ACS_JOIN,
     JOINED_ENCAMP_TRACTS,
     JOINED_311_TRACTS,
+    CLEAN_ZILLOW,
+    CLEAN_CROSSWALKS,
     MERGED,
 )
-
-acs_df = pd.read_csv(SF_ACS_JOIN)
 
 TENTS_EST = 1.1
 STRUCTURES_EST = 1.1
 VEHICLES_EST = 2.1
 
 
-def total_evictions_by_tract(eviction_df):
+def total_evictions_by_tract():
     """
     Combine current evictions data with census tracts
     to get total number of evictions within a tract for a given month
     """
     evictions_df = pd.read_csv(JOINED_EVICTIONS_TRACTS)
 
-    eviction_df["geoid"] = eviction_df["geoid"].astype(str).str.zfill(11)
-    group_by_month = eviction_df.groupby(["geoid", "year_mon"])
+    evictions_df["geoid"] = evictions_df["geoid"].astype(str).str.zfill(11)
+    group_by_month = evictions_df.groupby(["geoid", "year_mon"])
     total_evic_per_mon = group_by_month.size().reset_index(name="total_evictions")
 
     return total_evic_per_mon
 
 
-def calculate_eviction_rate(eviction_df, acs_df):
+def calculate_eviction_rate():
     """
     Divide total number of evictions within a tract for a given month
     by avg monthly num renter hh to get evictions rate
     return eviction_mon / rent_units
     """
-    agg_eviction_df = total_evictions_by_tract(eviction_df)
+    acs_df = pd.read_csv(SF_CENSUS_TRACTS)
+
+    agg_eviction_df = total_evictions_by_tract()
     acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
 
     merged = pd.merge(
@@ -60,7 +62,7 @@ def generate_rent_by_zip_dict():
 
     rent_by_zip = {}
 
-    with open("clean-data/tidy_zori.csv") as f:
+    with open(CLEAN_ZILLOW) as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["date"] not in rent_by_zip:
@@ -78,7 +80,7 @@ def generate_crosswalks_dict():
     """
     # Generate dictionary with crosswalks data
     crosswalks = {}
-    with open("clean-data/crosswalks.csv") as f:
+    with open(CLEAN_CROSSWALKS) as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["date"] not in crosswalks:
@@ -192,7 +194,7 @@ def generate_tidy_csv():
     tidy_df = pd.DataFrame(data)
 
     # Merge eviction data
-    eviction_records = calculate_eviction_rate(eviction_df, acs_df)
+    eviction_records = calculate_eviction_rate()
     df_evic_list = pd.DataFrame(eviction_records)
 
     tidy_df = pd.merge(
