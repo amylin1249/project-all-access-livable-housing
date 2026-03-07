@@ -1,5 +1,5 @@
 from pathlib import Path
-from dash import Dash, html, dcc, Input, Output
+from dash import Dash, html, dcc, Input, Output, dash
 from visualize import create_tract_map, create_scatterplot
 import dash_ag_grid as dag
 import pandas as pd
@@ -18,6 +18,11 @@ from shapely import geometry
 from shapely.ops import transform
 import dash_vega_components as dvc
 import calendar
+import io
+import base64
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
 
 from datatypes import (
     MERGED_SF_TRACTS_SHP,
@@ -29,7 +34,7 @@ my_chart = create_tract_map(
     start_date="2020-01", 
     end_date="2024-12", 
     col_name="eviction_rate", 
-    agg="sum"
+    agg="mean"
 )
 
 app = Dash(__name__)
@@ -63,9 +68,12 @@ app.layout = html.Div([
                 {"label": "Homelessness", "value": 'estimate'},
                 {"label": "Eviction Rate", "value": 'eviction_rate'},
                 {"label": "Median Rent", "value": 'median_rent'},
+                {"label": "311 Calls", "value": '311_calls'},
+                {"label": "Tents", "value": 'tents'},
+                {"label": "Structures", "value": 'structures'},
+                {"label": "Vehicles", "value": 'vehicles'}
             ],
             value="estimate"
-            
         ),
         # one line in between
         html.Br(), 
@@ -106,48 +114,51 @@ app.layout = html.Div([
                 ),
             ], style={'display': 'inline-block'}),
         ]),
-    ], style={'padding': '20px', 'backgroundColor': '#f9f9f9'}),
-    
+    ], style={'padding': '20px', 'backgroundColor':'#f9f9f9'}),
     
     html.Div([
         # left : map
         html.Div([
-            dvc.Vega(id='sf-map', spec={})
-        ], style={'width': '50%', 'padding': '10px', 'border': '1px solid #ddd', 'borderRadius': '10px'}),
+            html.H3(id="map-title",
+                    style={'textAlign': 'center', 'color':'#2c3e50','marginBottom': '15px'}),
+            html.Hr(),
+            html.Div([
+                dvc.Vega(
+                    id='sf-map', 
+                    spec={},
+                    style={'width': '100%', 'height': '500px'}
+            ),
+        ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}) 
+    ], style={
+        'width': '60%', 
+        'padding': '20px', 'border': '1px solid #ddd', 
+        'borderRadius': '10px', 'backgroundColor': 'white'
+    }),     
         
         # right : scatter plot
         html.Div([
-            html.H3("Scatter Plot", style={'textAlign': 'center', 'color': '#2c3e50'}),
+            html.H3(id="plot-title", style={'textAlign': 'center', 'color': '#2c3e50'}),
             html.Hr(),
             # Placeholder for scatter
-            html.Div(
-                id='scatter-plot-placeholder',
-                children=[
-                    html.P("Scatter Plot is being prepared...", 
-                           style={'textAlign': 'center', 'marginTop': '120px', 'color': '#999', 'fontStyle': 'italic'}),
-                    html.P("(e.g., Median Rent vs. Eviction Rate)", 
-                           style={'textAlign': 'center', 'color': '#ccc', 'fontSize': '12px'})
-                ],
-                style={
-                    'height': '450px', 
-                    'backgroundColor': '#fcfcfc', 
-                    'border': '2px dashed #3498db',
-                    'borderRadius': '10px',
-                    'display': 'flex',
-                    'flexDirection': 'column',
-                    'justifyContent': 'center'
-                }
-            )
-        ], style={'width': '50%', 'padding': '10px', 'marginLeft': '20px'})
-
+            #dvc.Vega(
+            #    id='scatter-plot-placeholder',
+            #    spec = {},
+            #    style = {"width" : "100%", "height": "450px"}
+            html.Img(id='scatter-plot', style={'width': '100%'})
+            #)
+        ], style = {"width" : "50%", "padding" : "20px", "marginLeft": "20px",'border': '1px solid #ddd', 'borderRadius': '10px', 'backgroundColor': 'white'
+        })
+            
     ], style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flex-start', 'padding': '20px'})
 ])
 
 
 @app.callback(
     [Output("sf-map", 'spec'), # update
-     Output("scatter-plot-placeholder", "spec")],
-    [Input('column-dropdown', 'value'), # change in column
+     Output("map-title", "children"), #title for map
+     Output("scatter-plot", "src"),
+     Output("plot-title", "children")],
+    [Input("column-dropdown", "value"), # change in column
      Input('start-year', 'value'),
      Input('start-month', 'value'),
      Input('end-year', 'value'),     # change in start-date
@@ -157,19 +168,46 @@ app.layout = html.Div([
 def update_map(selected_col, start_year, start_month, end_year, end_month):
     """automatically called when the value property of the dropdwon component changes
     """
-    start = f"{start_year}-{start_month}-01"
-    last_day = calendar.monthrange(int(end_year), int(end_month))[1]
-    end= f"{end_year}-{end_month}-{last_day}"
+    if any(v is None for v in [selected_col, start_year, start_month, end_year, end_month]):
+        raise dash.exceptions.PreventUpdate
+    
+    METRIC_NAMES = {
+        "311_calls": "311 calls",
+        "eviction_rate": "Eviction rate",
+        "median_rent": "Median rent",
+        "tents": "Tents",
+        "structures": "Structures",
+        "vehicles": "Vehicles",
+        "estimate": "Homelessness estimate",
+    }
+
+    start_dt= f"{start_year}-{start_month}-01"
+    year_num = int(end_year)
+    month_num = int(end_month)
+    last_day = calendar.monthrange(year_num, month_num)[1]
+    end_dt = f"{end_year}-{end_month}-{last_day}"
 
     new_chart = create_tract_map(
         source_file=MERGED, 
-        start_date=start, 
-        end_date=end, 
+        start_date=start_dt, 
+        end_date=end_dt, 
         col_name=selected_col, 
-        agg="sum"
+        agg = "mean"
     )
-    empty_scatter = {}
-    return new_chart.to_dict(), empty_scatter
+    
+    map_title = f"Average {METRIC_NAMES[selected_col].lower()} in SF tracts ({start_year}-{start_month} to {end_year}-{end_month})"
+    
+    buf = io.BytesIO()
+    create_scatterplot(MERGED, "estimate", "mean", selected_col, "mean")
+    plt.savefig(buf, format='png') # 현재 그려진 Seaborn 그림을 버퍼에 저장
+    plt.close() # 메모리 정리
+    
+    data = base64.b64encode(buf.getbuffer()).decode("utf8") # 이미지로 변환
+    new_scatter = f"data:image/png;base64,{data}"
+
+    plot_title = f"Median rent by tract vs. Average homelessness counts"
+
+    return new_chart.to_dict(),  map_title, new_scatter, plot_title
 
 if __name__ == "__main__":
     app.run(debug=True)

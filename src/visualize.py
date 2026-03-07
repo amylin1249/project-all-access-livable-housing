@@ -90,7 +90,7 @@ from datatypes import (
 
 
 def create_tract_map(
-    source_file: Path, start_date: str, end_date: str, col_name: str
+    source_file: Path, start_date: str, end_date: str, col_name: str, agg:str ="mean"
 ):
     """
     Add docstring
@@ -110,6 +110,9 @@ def create_tract_map(
     ### TBD ON WHETHER THIS SHOULD BE INSIDE OR OUTSIDE FUNCTION
 
     df["tract"] = df["tract"].astype(str).str.zfill(11)
+    df["date"] = pd.to_datetime(df["date"])
+    start_dt = pd.to_datetime(start_date)
+    end_dt = pd.to_datetime(end_date)
 
     filtered_df = (
         df[(df["date"] >= start_date) & (df["date"] <= end_date)]
@@ -136,9 +139,6 @@ def create_tract_map(
             from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
         )
         .project(type="albersUsa")
-        .properties(
-            title=f"Average {METRIC_NAMES[col_name].lower()} in SF tracts ({start_date} to {end_date})"
-        )
         .interactive()
     )
 
@@ -178,11 +178,11 @@ def create_scatterplot(
     )
     plt.xlabel("Average homelessness counts", fontsize=12)
     plt.ylabel("Median monthly rent ($)", fontsize=12)
-    plt.title(
-        "Median rent by tract vs. Average homelessness counts",
-        fontsize=14,
-        fontweight="bold",
-    )
+    #plt.title(
+    #    "Median rent by tract vs. Average homelessness counts",
+    #    fontsize=14,
+    #    fontweight="bold",
+    #)
     plt.show()
 
 
