@@ -1,6 +1,5 @@
 import pandas as pd
 import csv
-from datetime import datetime
 
 from datatypes import (
     CLEAN_ZILLOW,
