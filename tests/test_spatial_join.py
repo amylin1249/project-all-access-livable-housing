@@ -85,11 +85,11 @@ def four(empty):
     return empty
 
 
-def test_quadtree_is_split_no(empty):
+def test_spatial_join_is_split_no(empty):
     assert not empty.is_split(), "Node should not be split."
 
 
-def test_quadtree_add_polygon_basic(empty):
+def test_spatial_join_add_polygon_basic(empty):
     # Add a single polygon
     added_node = empty.add_polygon("SE", POLYGON_SE)
     assert len(empty.polygons) == 1, "Polygon was not added"
@@ -97,7 +97,7 @@ def test_quadtree_add_polygon_basic(empty):
     assert not empty.is_split(), "Polygon should not be split yet"
 
 
-def test_quadtree_add_polygon_not_inside(empty):
+def test_spatial_join_add_polygon_not_inside(empty):
     # Add a single polygon that is not within the bbox
     added_node = empty.add_polygon("OUT", POLYGON_OUTSIDE)
     assert added_node is False, "add_polygon should return false if not inside bbox"
@@ -105,7 +105,7 @@ def test_quadtree_add_polygon_not_inside(empty):
     assert not empty.is_split(), "Polygon should not have been added, outside bbox"
 
 
-def test_quadtree_add_polygon_two_quads(empty):
+def test_spatial_join_add_polygon_two_quads(empty):
     # Node should not split with the addition of only two polygons
     empty.add_polygon("SW", POLYGON_SW)
     empty.add_polygon("NE", POLYGON_NE)
@@ -115,7 +115,7 @@ def test_quadtree_add_polygon_two_quads(empty):
     )
 
 
-def test_quadtree_add_polygon_three_quads(four):
+def test_spatial_join_add_polygon_three_quads(four):
     # Node should split with the addition of three polygons as capacity has exceeded
     assert four.is_split(), "Node should have split, capacity exceeded"
     assert len(four.polygons) == 0, "Polygons should not exist on root node anymore"
@@ -130,7 +130,7 @@ def test_quadtree_add_polygon_three_quads(four):
     )
 
 
-def test_quadtree_inherit_parent_capacity(four):
+def test_spatial_join_inherit_parent_capacity(four):
     assert four.children, "Expecting children on fixture 'four'"
     for child in four.children:
         assert child.capacity == four.capacity, (
@@ -138,7 +138,7 @@ def test_quadtree_inherit_parent_capacity(four):
         )
 
 
-def test_quadtree_match_single_item(empty):
+def test_spatial_join_match_single_item(empty):
     empty.add_polygon("SE", POLYGON_SE)
     point = Point(-122.36, 37.72)  # inside POLYGON_SE
     matches = empty.match(point)
@@ -146,14 +146,14 @@ def test_quadtree_match_single_item(empty):
     assert "SE" in matches
 
 
-def test_quadtree_match_single_split(four):
+def test_spatial_join_match_single_split(four):
     point = Point(-122.36, 37.72)  # inside POLYGON_SE
     matches = four.match(point)
     assert len(matches) == 1
     assert "SE" in matches
 
 
-def test_quadtree_match_max_depth_split(empty):
+def test_spatial_join_match_max_depth_split(empty):
     # Add the same polygon 3 times to the bbox to force max depth split
     empty.add_polygon("A", POLYGON_SE)
     empty.add_polygon("B", POLYGON_SE)
@@ -163,24 +163,24 @@ def test_quadtree_match_max_depth_split(empty):
     assert matches == {"A", "B", "C"}, "All three polygons should contain point"
 
 
-def test_quadtree_match_no_matches(empty):
+def test_spatial_join_match_no_matches(empty):
     empty.add_polygon("SE", POLYGON_SE)
     matches = empty.match(Point(-122.43, 37.73))
     assert len(matches) == 0
 
 
-def test_quadtree_match_empty_tree(empty):
+def test_spatial_join_match_empty_tree(empty):
     matches = empty.match(Point(-122.43, 37.73))
     assert len(matches) == 0
 
 
-def test_quadtree_match_point_outside_bbox(empty):
+def test_spatial_join_match_point_outside_bbox(empty):
     empty.add_polygon("SE", POLYGON_SE)
     matches = empty.match(Point(-122.3, 37))  # Outside SF bbox
     assert len(matches) == 0
 
 
-def test_quadtree_join(locations, tracts):
+def test_spatial_join_join_polygons(locations, tracts):
     results = quadtree_spatial_join(locations, tracts)
     expected = {1: "T-X", 3: "T-Y"}
     # Location 1 is within T-X
@@ -189,7 +189,7 @@ def test_quadtree_join(locations, tracts):
     assert results == expected, f"Expected {expected}, got {results}"
 
 
-def test_quadtree_join_real_polygons(locations, real_tracts):
+def test_spatial_join_join_real_polygons(locations, real_tracts):
     results = quadtree_spatial_join(locations, real_tracts)
     expected = {1: "06075012002", 3: "06075023003"}
     assert results == expected, f"Expected {expected}, got {results}"
