@@ -27,8 +27,8 @@ CALI_TRACTS_SHP = (
 
 
 # Paths to raw encampment counts XLSX and 311 cases CSV
-ENCAMP_PATH = Path(__file__).parent.parent / "raw-data/encampment_counts.xlsx"
-REPORT_PATH = Path(__file__).parent.parent / "raw-data/311_cases.csv"
+RAW_ENCAMP = Path(__file__).parent.parent / "raw-data/raw_encampments_data.xlsx"
+RAW_311 = Path(__file__).parent.parent / "raw-data/raw_311_data.csv"
 
 
 # Paths to clean evictions, encampment counts, and 311 cases CSV files
@@ -59,8 +59,8 @@ MERGED = Path(__file__).parent.parent / "clean-data/merged_data.csv"
 
 
 # Column IDs of metrics of interest from raw ACS CSV files
-POP_ID = "AUO6E001"
-RENT_ID = "AUWGE001"
-HH_INC_ID = "AURUE001"
-WHITE_POP_ID = "AUO7E002"
-RENTER_UNITS_ID = "AUUEE003"
+ACS_POP_ID = "AUO6E001"
+ACS_RENT_ID = "AUWGE001"
+ACS_HH_INC_ID = "AURUE001"
+ACS_WHITE_POP_ID = "AUO7E002"
+ACS_RENTER_UNITS_ID = "AUUEE003"

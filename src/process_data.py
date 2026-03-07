@@ -6,6 +6,8 @@ import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
 from datatypes import (
+    RAW_ENCAMP,
+    RAW_311,
     RAW_ACS_POP,
     RAW_ACS_RENT,
     RAW_ACS_HH_INC,
@@ -13,20 +15,16 @@ from datatypes import (
     RAW_ACS_RENTER_UNITS,
     RAW_SF_TRACTS,
     CALI_TRACTS_SHP,
-    ENCAMP_PATH,
-    REPORT_PATH,
     CLEAN_ENCAMP,
     CLEAN_311,
     SF_ACS_JOIN,
     SF_TRACTS_SHP,
     MERGED_SF_TRACTS_SHP,
-    POP_ID,
-    RENT_ID,
-    HH_INC_ID,
-    WHITE_POP_ID,
-    RENTER_UNITS_ID,
-    REPORT_PATH,
-    ENCAMP_PATH
+    ACS_POP_ID,
+    ACS_RENT_ID,
+    ACS_HH_INC_ID,
+    ACS_WHITE_POP_ID,
+    ACS_RENTER_UNITS_ID,
 )
 
 
@@ -139,7 +137,7 @@ def generate_311_csv():
     ADD DOCSTRING
     """
     # Load raw data
-    df = pd.read_csv(REPORT_PATH)
+    df = pd.read_csv(RAW_311)
 
     # Keep only necessary columns
     df = df[["Opened", "Address", "Latitude", "Longitude"]]
@@ -188,7 +186,7 @@ def generate_encampments_csv():
     ADD DOCSTRING
     """
     # Top row (row 0) is not a real header row
-    df = pd.read_excel(ENCAMP_PATH, header=1)
+    df = pd.read_excel(RAW_ENCAMP, header=1)
 
     # Keep only necessary columns
     df = df[
@@ -396,30 +394,30 @@ def process_acs_data():
     """
     # Read in ACS CSV files as dataframes and specify columns of interest
     pop_df = pd.read_csv(
-        RAW_ACS_POP, usecols=["TL_GEO_ID", POP_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_POP, usecols=["TL_GEO_ID", ACS_POP_ID], dtype={"TL_GEO_ID": "str"}
     )
     race_df = pd.read_csv(
-        RAW_ACS_RACE, usecols=["TL_GEO_ID", WHITE_POP_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_RACE, usecols=["TL_GEO_ID", ACS_WHITE_POP_ID], dtype={"TL_GEO_ID": "str"}
     )
     rent_df = pd.read_csv(
-        RAW_ACS_RENT, usecols=["TL_GEO_ID", RENT_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_RENT, usecols=["TL_GEO_ID", ACS_RENT_ID], dtype={"TL_GEO_ID": "str"}
     )
     hh_inc_df = pd.read_csv(
-        RAW_ACS_HH_INC, usecols=["TL_GEO_ID", HH_INC_ID], dtype={"TL_GEO_ID": "str"}
+        RAW_ACS_HH_INC, usecols=["TL_GEO_ID", ACS_HH_INC_ID], dtype={"TL_GEO_ID": "str"}
     )
     renter_df = pd.read_csv(
         RAW_ACS_RENTER_UNITS,
-        usecols=["TL_GEO_ID", RENTER_UNITS_ID],
+        usecols=["TL_GEO_ID", ACS_RENTER_UNITS_ID],
         dtype={"TL_GEO_ID": "str"},
     )
 
     # Impute negative values (i.e., missing) in rent and household income
     # dataframes with the mean of their positive values
-    mean_rent = round(rent_df.loc[rent_df[RENT_ID] > 0, RENT_ID].mean())
-    rent_df.loc[rent_df[RENT_ID] < 0, RENT_ID] = mean_rent
+    mean_rent = round(rent_df.loc[rent_df[ACS_RENT_ID] > 0, ACS_RENT_ID].mean())
+    rent_df.loc[rent_df[ACS_RENT_ID] < 0, ACS_RENT_ID] = mean_rent
 
-    mean_hh_inc = round(hh_inc_df.loc[hh_inc_df[HH_INC_ID] > 0, HH_INC_ID].mean())
-    hh_inc_df.loc[hh_inc_df[HH_INC_ID] < 0, HH_INC_ID] = mean_hh_inc
+    mean_hh_inc = round(hh_inc_df.loc[hh_inc_df[ACS_HH_INC_ID] > 0, ACS_HH_INC_ID].mean())
+    hh_inc_df.loc[hh_inc_df[ACS_HH_INC_ID] < 0, ACS_HH_INC_ID] = mean_hh_inc
 
     # Merge individual dataframes based on GEO_ID
     joined_df = pop_df
@@ -429,11 +427,11 @@ def process_acs_data():
     # Rename population, race, rent, income, and renter units column names
     joined_df = joined_df.rename(
         columns={
-            POP_ID: "population",
-            WHITE_POP_ID: "white_pop",
-            RENT_ID: "med_rent",
-            HH_INC_ID: "med_hh_inc",
-            RENTER_UNITS_ID: "rent_units",
+            ACS_POP_ID: "population",
+            ACS_WHITE_POP_ID: "white_pop",
+            ACS_RENT_ID: "med_rent",
+            ACS_HH_INC_ID: "med_hh_inc",
+            ACS_RENTER_UNITS_ID: "rent_units",
         }
     )
 
