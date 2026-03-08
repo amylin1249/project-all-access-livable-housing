@@ -7,7 +7,17 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from .datatypes import MERGED
+from .datatypes import MERGED, CLEAN_ZILLOW
+import pandas as pd
+
+df_merged = pd.read_csv(MERGED)
+all_tracts = sorted(df_merged["tract"].astype(str).str.zfill(11).unique())
+
+try:
+    df_zillow = pd.read_csv(CLEAN_ZILLOW)
+    all_zips = sorted(df_zillow["zip"].astype(str).str.zfill(5).unique())
+except:
+    all_zips = []
 
 # map_chart = create_tract_map(
 #     source_file=MERGED,
@@ -389,7 +399,7 @@ def render_content(tab):
                         # dropdown
                         html.Label("Select Zip-code:", style={"fontWeight": "bold"}),
                         dcc.Dropdown(
-                            id="scatter-metric-dropdown",
+                            id="zip-dropdown",
                             options=[
                                 {"label": "Median Rent", "value": "median_rent"},
                                 # {"label": "Time", "value": "start_date"},
@@ -436,12 +446,12 @@ def render_content(tab):
                         html.B("Analysis: "),
                         "Homelessness estimate : tents + vehicles + structures",
                     html.Br(),
-                    html.Label("Select Census Tract:", style={"marginTop": "10px"}),
+                    html.Label("Select Tract ID:"),
                 
                     dcc.Dropdown(
                         id="tract-dropdown",
-                        options=[{"label": str(t), "value": str(t)} for t in "tract"],
-                        value=str("tract"[0]), 
+                        options=[{"label": str(t), "value": str(t)} for t in all_tracts],
+                        value=all_tracts[0] if all_tracts else None, 
                         clearable=False,
                     style={"width": "300px", "color": "black"}
                 ),
@@ -575,10 +585,13 @@ def update_regression(tab_value):
     [Output("rent-scatter-plot", "spec")],
     [Input("tabs-content", "value")]
 )
-def update_rent_scatter(tab_value):
+def update_rent_scatter(tab_value, selected_zip):
     if tab_value != "tab-rent":
         raise dash.exceptions.PreventUpdate
-    return {}
+    rent_scatterplot = create_rent_scatterplot(
+        zip_code=selected_zip
+    )
+    return rent_scatterplot.to_dict()
 
 
 @app.callback(
@@ -586,19 +599,20 @@ def update_rent_scatter(tab_value):
         Output("homeless-1", "spec"), 
         Output("homeless-2", "spec")
     ],
-    [Input("tabs-content", "value")]
+    [Input("tabs-content", "value"), 
+     Input("tract-dropdown", "value")]
 )
-def update_homeless_scatter(tab_value):
-    if tab_value != "tab-homeless":
+def update_homeless_scatter(tab_value,selected_tract):
+    if tab_value != "tab-homeless" or not selected_tract:
         raise dash.exceptions.PreventUpdate
     
     homeless_scatterplot = create_homeless_scatterplot(
-    tract_id="tract"
+    tract_id=selected_tract
     )
 
     #homeless_title = "Title"
     encampments_scatterplot = create_encampments_scatterplot(
-    tract_id="tract"
+    tract_id=selected_tract
     )
     #encampment_title = "Title2"
 
