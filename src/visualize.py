@@ -194,9 +194,10 @@ def create_scatterplot(
 def create_reg_chart():
 
     variables = [
-        "Median Rent (Tract)",
-        "Median Household Income (Tract)",
+        "Median Rent",
+        "Median Household Income",
         "Percentage White",
+        
         "Total Tents",
         "Total Structures",
         "Total Vehicles"
@@ -227,7 +228,7 @@ def create_reg_chart():
     error_bars = alt.Chart(df).mark_rule(strokeWidth=3).encode(
         x="ci_lower:Q",
         x2="ci_upper:Q",
-        y=alt.Y("variable:N", sort=None),
+        y=alt.Y("variable:N", sort=None, ),
         color=alt.condition(
             alt.datum.significant,
             alt.value("blue"),
@@ -240,12 +241,12 @@ def create_reg_chart():
         alt.Chart(df)
         .mark_point(size=300, filled=True)
         .encode(
-            x="coefficient:Q",
-            y=alt.Y("variable:N", sort='x'),
+            x=alt.X("coefficient:Q", axis=alt.Axis(title="Coefficient Value")),
+            y=alt.Y("variable:N", sort="x", axis=alt.Axis(title=None)),
             color=alt.condition(
                 alt.datum.significant,
-                alt.value("blue"),  
-                alt.value("black"),   
+                alt.value("blue"),
+                alt.value("black"),
             ),
             tooltip=[
                 alt.Tooltip("variable:N", title="Variable"),
@@ -265,6 +266,7 @@ def create_reg_chart():
         .properties(
             width=1400,
             height=900,
+            padding={"left": 10, "right": 10, "top": 20, "bottom": 20},
             title=alt.Title("Total Encampments Reported Per Tract", fontSize=30),
         )
         .configure_axis(labelFontSize=18, titleFontSize=22)
