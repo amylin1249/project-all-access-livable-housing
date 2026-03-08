@@ -3,14 +3,12 @@ import geopandas as gpd
 import altair as alt
 from pathlib import Path
 
-from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
+from .datatypes import MERGED_SF_TRACTS_SHP, MERGED, CLEAN_ZILLOW
 
 # from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
-def create_tract_map(
-    source_file: Path, start_date: str, end_date: str, col_name: str
-):
+def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name: str):
     """
     Add docstring
     """
@@ -84,7 +82,6 @@ def create_reg_chart():
         ["Median Rent", "(Tract)"],
         ["Median Household", "Income (Tract)"],
         "Percentage White",
-        
         "Total Tents",
         "Total Structures",
         "Total Vehicles",
@@ -148,7 +145,8 @@ def create_reg_chart():
                     labelFontSize=10,
                     labelAngle=-30,
                     labelPadding=10,
-                ),),
+                ),
+            ),
             color=alt.condition(
                 alt.datum.significant,
                 alt.value("blue"),
@@ -156,10 +154,15 @@ def create_reg_chart():
             ),
             tooltip=[
                 alt.Tooltip("variable:N", title="Variable"),
-                alt.Tooltip("coefficient:Q", title="Coefficient (Unique 311 Reports)", format=".3f"),
+                alt.Tooltip(
+                    "coefficient:Q",
+                    title="Coefficient (Unique 311 Reports)",
+                    format=".3f",
+                ),
                 alt.Tooltip("significant:N", title="Significant"),
             ],
-        ))
+        )
+    )
 
     x_zero = (
         alt.Chart(pd.DataFrame({"x": [0]}))
@@ -174,7 +177,13 @@ def create_reg_chart():
             width="container",
             height=450,
             padding={"left": 10, "right": 10, "top": 20, "bottom": 20},
-            title=alt.Title(['Regression Analysis: Impact of Tract Features', 'on Total Number of Unique Reports'], fontSize=15),
+            title=alt.Title(
+                [
+                    "Regression Analysis: Impact of Tract Features",
+                    "on Total Number of Unique Reports",
+                ],
+                fontSize=15,
+            ),
         )
         .configure_axis(labelFontSize=18, titleFontSize=22)
     )
@@ -189,14 +198,18 @@ def create_reg_chart():
     #     .configure_axis(labelFontSize=18, titleFontSize=22)
     # )
     return chart.resolve_scale(color="independent")
-    
 
+<<<<<<< HEAD
 def create_homeless_scatterplot(source_file: Path, tract_id: str):
+=======
+
+def homeless_scatterplot(tract_id: str):
+>>>>>>> b4f756848a5114f80f8eeae872f9ad4a49541f9c
     """
     Add docstring
     """
 
-    df = pd.read_csv(source_file)
+    df = pd.read_csv(MERGED)
 
     df["tract"] = df["tract"].astype(str).str.zfill(11)
 
@@ -205,50 +218,73 @@ def create_homeless_scatterplot(source_file: Path, tract_id: str):
     chart = (
         alt.Chart(filtered_df)
         .mark_line(point=True)
-        .encode(
-            x=alt.X("date:T"),
-            y=alt.Y("estimate:Q"))
+        .encode(x=alt.X("date:T"), y=alt.Y("estimate:Q"))
         .properties(title="temporary title")
     )
 
     return chart
 
 
+<<<<<<< HEAD
 def create_encampments_scatterplot(source_file: Path, tract_id: str):
     df = pd.read_csv(source_file)
+=======
+def encampments_scatterplot(tract_id: str):
+    df = pd.read_csv(MERGED)
+>>>>>>> b4f756848a5114f80f8eeae872f9ad4a49541f9c
 
     df["tract"] = df["tract"].astype(str).str.zfill(11)
 
     filtered_df = df[df["tract"] == tract_id]
 
     folded_chart = (
+<<<<<<< HEAD
             alt.Chart(filtered_df)
             .mark_line()
             .transform_fold(
                 fold= ["Structures", "Tents", "Vehicles"],
                 as_=["measurement", "value"],)
             .encode(
-                x=alt.X("Date:T"),
+                x=alt.X("date:T"),
                 y=alt.Y("value:Q"),
                 color=alt.Color("measurement:N"),
+=======
+        alt.Chart(filtered_df)
+        .mark_line()
+        .transform_fold(
+            fold=["Structures", "Tents", "Vehicles"],
+            as_=["measurement", "value"],
+        )
+        .encode(
+            x=alt.X("Date:T"),
+            y=alt.Y("value:Q"),
+            color=alt.Color("measurement:N"),
+>>>>>>> 3028bb6e564a481d967e84239ffc2c917599cb20
         )
     )
 
     return folded_chart
-    
-
-# def scatter_encamp(
-#     source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
-# ):
-#     """
-#     Add docstring
-#     """
 
 
-#     df = pd.read_csv(source_file)
-#     df["date"] = pd.to_datetime(df["date"])
+def rent_scatterplot(zip_code: str):
+    df = pd.read_csv(CLEAN_ZILLOW)
 
+    df["zip"] = df["zip"].astype(str).str.zfill(5)
 
+    filtered_df = df[df["zip"] == zip_code]
+
+    chart = (
+            alt.Chart(filtered_df)
+            .mark_line()
+            .encode(
+                x=alt.X("date:T"),
+                y=alt.Y("rent:Q"),
+        )
+    )
+
+<<<<<<< HEAD
+    return chart
+=======
 #     df = df.rename(
 #             columns={
 #                 "tents": "Tents",
@@ -258,12 +294,12 @@ def create_encampments_scatterplot(source_file: Path, tract_id: str):
 #                 "date": "Date",
 
 #             }
-#         )    
+#         )
 
 
 #     tract_select = alt.selection_point(
 #             fields=['Tract'],
-#             bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract') 
+#             bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract')
 #         )
 
 
@@ -281,6 +317,7 @@ def create_encampments_scatterplot(source_file: Path, tract_id: str):
 #             ).add_params(tract_select)
 #         )
 #     folded_chart
+>>>>>>> 3028bb6e564a481d967e84239ffc2c917599cb20
 
 
 if __name__ == "__main__":
@@ -292,4 +329,3 @@ if __name__ == "__main__":
     #     "median_rent",
     #     "mean",
     # )
-

@@ -118,6 +118,7 @@ def grab_acs_data():
     acs_df["TL_GEO_ID"] = acs_df["TL_GEO_ID"].astype(str).str.zfill(11)
     return acs_df
 
+
 def calculate_eviction_rate(acs_df):
     """
     Divide total number of evictions within a tract for a given month
@@ -202,7 +203,9 @@ def generate_tidy_csv(acs_df):
     for tract in census_tracts:
         median_rent_col = tidy_df[tidy_df["tract"] == tract]["median_rent"]
         avg_rent = median_rent_col.mean()
-        scaling_factor = acs_df.loc[acs_df["TL_GEO_ID"] == tract, "med_rent"].item() / avg_rent
+        scaling_factor = (
+            acs_df.loc[acs_df["TL_GEO_ID"] == tract, "med_rent"].item() / avg_rent
+        )
         median_rent_col = scaling_factor * median_rent_col
 
     # Merge eviction data
@@ -260,7 +263,7 @@ def generate_tidy_csv(acs_df):
         # Linear interpolation for all encampments (tents, structures, and vehicles)
         tract_group[encampment_cols] = tract_group[encampment_cols].interpolate(
             method="linear"
-            #, limit_direction="both"
+            # , limit_direction="both"
         )
 
         tract_group["date"] = tract_group.index
