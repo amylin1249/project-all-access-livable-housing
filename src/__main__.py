@@ -27,10 +27,10 @@ from .datatypes import (
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data", help="Get clean and consolidated data files"
+        "--data", action="store_true", help="Get clean and consolidated data files"
     )
     parser.add_argument(
-        "--dashboard", help="Access interactive dashboard"
+        "--dashboard", action="store_true", help="Access interactive dashboard"
     )
     args = parser.parse_args()
 
