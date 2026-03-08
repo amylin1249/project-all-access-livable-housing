@@ -1,6 +1,6 @@
 from dash import Dash, html, dcc, Input, Output, dash
 import dash_bootstrap_components as dbc
-from .visualize import create_tract_map, create_reg_chart, create_homeless_scatterplot, create_encampments_scatterplot
+from .visualize import create_tract_map, create_reg_chart, create_rent_scatterplot, create_homeless_scatterplot, create_encampments_scatterplot
 import dash_vega_components as dvc
 import calendar
 import matplotlib
@@ -435,7 +435,17 @@ def render_content(tab):
                     [
                         html.B("Analysis: "),
                         "Homelessness estimate : tents + vehicles + structures",
-                    ],
+                    html.Br(),
+                    html.Label("Select Census Tract:", style={"marginTop": "10px"}),
+                
+                    dcc.Dropdown(
+                        id="tract-dropdown",
+                        options=[{"label": str(t), "value": str(t)} for t in "tract"],
+                        value=str("tract"[0]), 
+                        clearable=False,
+                    style={"width": "300px", "color": "black"}
+                ),
+                ],
                     style={
                         "padding": "20px",
                         "backgroundColor": "#f1f3f5",
@@ -443,6 +453,8 @@ def render_content(tab):
                         "marginBottom": "20px",
                     },
                 ),
+                
+                
                 # scatter plots
                 html.Div(
                     [
@@ -529,7 +541,6 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     end_dt = f"{end_year}-{end_month}-{last_day}"
 
     map_chart = create_tract_map(
-        source_file=MERGED,
         start_date=start_dt,
         end_date=end_dt,
         col_name=selected_col,
@@ -582,19 +593,17 @@ def update_homeless_scatter(tab_value):
         raise dash.exceptions.PreventUpdate
     
     homeless_scatterplot = create_homeless_scatterplot(
-    source_file=MERGED,
-    tract_id="tract_id"
+    tract_id="tract"
     )
 
-    homeless_title = "Title"
+    #homeless_title = "Title"
     encampments_scatterplot = create_encampments_scatterplot(
-        source_file=MERGED,
-    tract_id="tract_id"
+    tract_id="tract"
     )
-    encampment_title = "Title2"
+    #encampment_title = "Title2"
 
 
-    return homeless_scatterplot.to_dict(), homeless_title, encampments_scatterplot.to_dict(), encampment_title
+    return homeless_scatterplot.to_dict(),  encampments_scatterplot.to_dict()
 
 
 if __name__ == "__main__":

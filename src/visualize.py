@@ -213,12 +213,8 @@ def create_reg_chart():
 
     return chart.resolve_scale(color="independent")
 
-<<<<<<< HEAD
-def create_homeless_scatterplot(source_file: Path, tract_id: str):
-=======
 
 def create_homeless_scatterplot(tract_id: str):
->>>>>>> 82d290fd54b64801fd3d178ae27aae5aa428f2d2
     """
     Add docstring
     """
@@ -239,13 +235,8 @@ def create_homeless_scatterplot(tract_id: str):
     return chart
 
 
-<<<<<<< HEAD
-def create_encampments_scatterplot(source_file: Path, tract_id: str):
-    df = pd.read_csv(source_file)
-=======
 def create_encampments_scatterplot(tract_id: str):
     df = pd.read_csv(MERGED)
->>>>>>> 82d290fd54b64801fd3d178ae27aae5aa428f2d2
 
     df["tract"] = df["tract"].astype(str).str.zfill(11)
 
