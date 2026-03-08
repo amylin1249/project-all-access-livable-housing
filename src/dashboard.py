@@ -1,33 +1,11 @@
-from pathlib import Path
 from dash import Dash, html, dcc, Input, Output, dash
-from .visualize import create_tract_map, create_scatterplot
-import dash_ag_grid as dag
-import pandas as pd
-import plotly.express as px
-import sys
-import shapefile
-import folium
-import webbrowser
-import geopandas as gpd
-import altair as alt
-from altair_saver import save
-import seaborn as sns
-import matplotlib.pyplot as plt
-from pyproj import Transformer, CRS
-from shapely import geometry
-from shapely.ops import transform
+from .visualize import create_tract_map, create_reg_chart
 import dash_vega_components as dvc
 import calendar
-import io
-import base64
 import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
-
-from .datatypes import (
-    MERGED_SF_TRACTS_SHP,
-    MERGED
-)
+from .datatypes import MERGED
 
 my_chart = create_tract_map(
     source_file=MERGED, 
@@ -40,7 +18,8 @@ my_chart = create_tract_map(
 app = Dash(__name__)
 
 app.layout = html.Div([
-    html.H1("San Francisco Housing & Eviction Dashboard",style={'textAlign': 'center', 'color': '#2c3e50'}),
+    html.H1("San Francisco Housing & Eviction Dashboard",
+            style={'textAlign': 'center', 'color': '#2c3e50'}),
     
     # one line in between
     html.Br(),
@@ -85,13 +64,19 @@ app.layout = html.Div([
                 html.Label("Start Period:"),
                 dcc.Dropdown(
                     id="start-year",
-                    options=[{"label": str(y), "value": str(y)} for y in range(2020, 2025)],
+                    options=[
+                        {"label": str(y), "value": str(y)} 
+                        for y in range(2020, 2025)
+                        ],
                     value="2020",
                     style={"width": "120px", "display": "inline-block"}
                 ),
                 dcc.Dropdown(
                     id="start-month",
-                    options=[{"label": calendar.month_name[m], "value": f"{m:02d}"} for m in range(1, 13)],
+                    options=[
+                        {"label": calendar.month_name[m], "value": f"{m:02d}"} 
+                        for m in range(1, 13)
+                        ],
                     value='01', 
                     style={'width': '150px', 'display': 'inline-block', 'marginLeft': '10px'}
                 ),
@@ -102,13 +87,19 @@ app.layout = html.Div([
                 html.Label("End Period:", style={'marginLeft': '30px'}),
                 dcc.Dropdown(
                     id='end-year',
-                    options=[{'label': str(y), 'value': str(y)} for y in range(2020, 2026)],
+                    options=[
+                        {'label': str(y), 'value': str(y)}
+                             for y in range(2020, 2026)
+                             ],
                     value='2020',
                     style={'width': '120px', 'display': 'inline-block', 'marginLeft': '10px'}
                 ),
                 dcc.Dropdown(
                     id="end-month",
-                    options=[{"label": calendar.month_name[m], "value": f"{m:02d}"} for m in range(1, 13)],
+                    options=[
+                        {"label": calendar.month_name[m], "value": f"{m:02d}"}
+                        for m in range(1, 13)
+                        ],
                     value='02', 
                     style={'width': '150px', 'display': 'inline-block', 'marginLeft': '10px'}
                 ),
@@ -127,47 +118,43 @@ app.layout = html.Div([
                     id='sf-map', 
                     spec={},
                     style={'width': '100%', 'height': '500px'}
-            ),
-        ], style={'display': 'flex', 'justifyContent': 'center',"width":"100%","paddingLeft":"50px"}) 
-    ], style={
-        'width': '60%', 
-        'padding': '20px', 'border': '1px solid #ddd', 
-        'borderRadius': '10px', 'backgroundColor': 'white', 'boxSizing': 'border-box'
-    }),     
+                ),
+            ], style={'display': 'flex', 'justifyContent': 'center',"width":"100%","paddingLeft":"10px"}) 
+        ], style={
+            'width': '50%', 
+            'padding': '20px', 'border': '1px solid #ddd', 
+            'borderRadius': '10px', 'backgroundColor': 'white', 'boxSizing': 'border-box'
+        }),     
         
-        # right : scatter plot
+        # right : regression chart
         html.Div([
-            html.H3(id="plot-title", style={'textAlign': 'center', 'color': '#2c3e50'}),
+            html.H3(id="regression-title", 
+                    style={'textAlign': 'center', 'color': '#2c3e50'}),
             html.Hr(),
-            # Placeholder for scatter
-            #dvc.Vega(
-            #    id='scatter-plot-placeholder',
-            #    spec = {},
-            #    style = {"width" : "100%", "height": "450px"}
-            html.Img(id='scatter-plot', style={'width': '100%'})
-            #)
-        ], style = {"width" : "50%", "padding" : "20px", "marginLeft": "20px",'border': '1px solid #ddd', 'borderRadius': '10px', 'backgroundColor': 'white'
-        })
-            
-    ], style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flex-start', 'padding': '20px'})
-])
-
+            dvc.Vega(
+                id='reg-chart',
+                spec = {},
+                style = {"width" : "100%", "height": "500px"}
+            )
+        ], style = {"width" : "50%", "padding" : "20px", "marginLeft": "20px",'border': '1px solid #ddd', 'borderRadius': '10px', 'backgroundColor': 'white',
+        }),  
+    ], style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flex-start', 'padding': '10px'}),
+ ],style={"maxWidth": "1200px", "margin": "0 auto"})
 
 @app.callback(
     [Output("sf-map", 'spec'), # update
-     Output("map-title", "children"), #title for map
-     Output("scatter-plot", "src"),
-     Output("plot-title", "children")],
+     Output("map-title", "children"), #title-map
+     Output("reg-chart", "spec"), #update
+     Output("regression-title", "children")], #title-regression
     [Input("column-dropdown", "value"), # change in column
-     Input('start-year', 'value'),
-     Input('start-month', 'value'),
-     Input('end-year', 'value'),     # change in start-date
-     Input('end-month', 'value')]       # change in end-date
+     Input("start-year", "value"), # change in start-date
+     Input("start-month", "value"),
+     Input("end-year", "value"),     # change in end-date
+     Input("end-month", "value")]      
 )
 
-def update_map(selected_col, start_year, start_month, end_year, end_month):
-    """automatically called when the value property of the dropdwon component changes
-    """
+def update_dashboard(selected_col, start_year, start_month, end_year, end_month):
+    
     if any(v is None for v in [selected_col, start_year, start_month, end_year, end_month]):
         raise dash.exceptions.PreventUpdate
     
@@ -187,7 +174,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     last_day = calendar.monthrange(year_num, month_num)[1]
     end_dt = f"{end_year}-{end_month}-{last_day}"
 
-    new_chart = create_tract_map(
+    map_chart = create_tract_map(
         source_file=MERGED, 
         start_date=start_dt, 
         end_date=end_dt, 
@@ -197,17 +184,10 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     
     map_title = f"Average {METRIC_NAMES[selected_col].lower()} in SF tracts ({start_year}-{start_month} to {end_year}-{end_month})"
     
-    buf = io.BytesIO()
-    create_scatterplot(MERGED, "estimate", "mean", selected_col, "mean")
-    plt.savefig(buf, format='png') #Seaborn as png
-    plt.close() # 
-    
-    data = base64.b64encode(buf.getbuffer()).decode("utf8") # into img
-    new_scatter = f"data:image/png;base64,{data}"
+    new_reg = create_reg_chart()
+    reg_title = f"Total Encampments Reported per Tract"
 
-    plot_title = f"Median rent by tract vs. Average homelessness counts"
-
-    return new_chart.to_dict(),  map_title, new_scatter, plot_title
+    return map_chart.to_dict(),  map_title, new_reg.to_dict(), reg_title
 
 if __name__ == "__main__":
     app.run(debug=True)

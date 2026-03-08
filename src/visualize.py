@@ -1,8 +1,6 @@
 import pandas as pd
 import geopandas as gpd
 import altair as alt
-import seaborn as sns
-import matplotlib.pyplot as plt
 from pathlib import Path
 
 
@@ -38,9 +36,9 @@ def create_tract_map(
     end_dt = pd.to_datetime(end_date)
 
     filtered_df = (
-        df[(df["date"] >= start_date) & (df["date"] <= end_date)]
+        df[(df["date"] >= start_dt) & (df["date"] <= end_dt)]
         .groupby("tract")
-        .agg(metric=(col_name, "mean"))
+        .agg(metric=(col_name, agg))
         .reset_index()
     )
 
@@ -48,7 +46,10 @@ def create_tract_map(
         alt.Chart(sf_tracts)
         .mark_geoshape()
         .encode(
-            color=alt.Color("metric:Q", title={METRIC_NAMES[col_name]}),
+            color=alt.Color("metric:Q", title=METRIC_NAMES[col_name].split(),
+                            legend=alt.Legend(
+                                orient="right", direction="vertical", titleAnchor = "end", labelAlign = "right", titlePadding =10
+    )),
             tooltip=[
                 alt.Tooltip("GEOID:N", title="Tract ID"),
                 alt.Tooltip("population:Q", title="Population"),
@@ -61,64 +62,28 @@ def create_tract_map(
             lookup="GEOID",
             from_=alt.LookupData(filtered_df, ("tract"), ["metric"]),
         )
-        .project(type="albersUsa")
+        #.project(type="albersUsa")
+        .project(
+            type='mercator', 
+            scale=160000,    
+            center=[-122.433, 37.765]
+        )
         .properties(
             width='container',      
-            height='container',
+            height=550,
             autosize=alt.AutoSizeParams(type='fit', contains='padding')
         )
         .interactive()
     )
 
-    return chart
-
-
-def create_scatterplot(
-    source_file: Path, x_var: str, x_agg: str, y_var: str, y_agg: str
-):
-    """
-    Docstring
-    """
-    sns.set_theme(style="whitegrid")
-
-    # Load dataset
-    df = pd.read_csv(source_file)
-    filtered_df = (
-        df.groupby("tract")
-        .agg(x_axis=(x_var, x_agg), y_axis=(y_var, y_agg))
-        .reset_index()
-    )
-
-    # Draw a scatter plot while assigning point colors and sizes to different
-    # variables in the dataset
-    f, ax = plt.subplots(figsize=(6.5, 6.5))
-    sns.despine(f, left=True, bottom=True)
-    sns.scatterplot(
-        x="x_axis",
-        y="y_axis",
-        # hue="white_pct",
-        # size="population",  ### To update these to the right metrics once dataset finalized
-        palette="ch:r=-.2,d=.3_r",
-        sizes=(1, 100),
-        linewidth=0,
-        data=filtered_df,
-        ax=ax,
-    )
-    plt.xlabel("Average homelessness counts", fontsize=12)
-    plt.ylabel("Median monthly rent ($)", fontsize=12)
-    #plt.title(
-    #    "Median rent by tract vs. Average homelessness counts",
-    #    fontsize=14,
-    #    fontweight="bold",
-    #)
-    plt.show()
+    return chart.resolve_scale(color='independent')
 
 
 def create_reg_chart():
 
     variables = [
-        "Median Rent (Tract)",
-        "Median Household Income (Tract)",
+        ["Median Rent", "(Tract)"],
+        ["Median Household", "Income (Tract)"],
         "Percentage White",
         "Total Tents",
         "Total Structures",
@@ -161,10 +126,19 @@ def create_reg_chart():
     # Points (coefficient estimates)
     points = (
         alt.Chart(df)
-        .mark_point(size=300, filled=True)
+        .mark_point(size=200, filled=True)
         .encode(
-            x="coefficient:Q",
-            y=alt.Y("variable:N", sort='x'),
+            x="coefficient:Q", 
+            y=alt.Y("variable:N", 
+                sort='x',
+                axis = alt.Axis(
+                    labelAlign="right",
+                    labelFontSize=10,
+                    labelAngle=-30,          
+                    labelPadding=10
+                )
+            ),
+
             color=alt.condition(
                 alt.datum.significant,
                 alt.value("blue"),  
@@ -172,27 +146,39 @@ def create_reg_chart():
             ),
             tooltip=[
                 alt.Tooltip("variable:N", title="Variable"),
-                alt.Tooltip("coefficient:Q", title="Coefficient", format=".2f"),
+                alt.Tooltip("coefficient:Q", title="Coefficient", format=".3f"),
                 alt.Tooltip("significant:N", title="Significant"),
             ],
         )
     )
 
 
-    x_zero = alt.Chart(pd.DataFrame({'x':[0]})).mark_rule(color='black', size=2, strokeDash=[4,4]).encode(x='x:Q')
+    x_zero = (
+        alt.Chart(pd.DataFrame({'x':[0]})).mark_rule(
+        color='black',
+        strokeDash=[4,4]
+    ).encode(x='x:Q')
+    )
 
 
     # Combine layers
     chart = (
-        (x_zero + error_bars + points)
-        .properties(
-            width=1400,
-            height=900,
-            title=alt.Title("Total Encampments Reported Per Tract", fontSize=30),
-        )
-        .configure_axis(labelFontSize=18, titleFontSize=22)
+        x_zero + error_bars + points
+    ).properties(
+        width="container",
+        height=450,
     )
-    return chart
+
+    # chart = (
+    #     (x_zero + error_bars + points)
+    #     .properties(
+    #         width=600,
+    #         height=500,
+    #         title=alt.Title("Total Encampments Reported Per Tract", fontSize=30),
+    #     )
+    #     .configure_axis(labelFontSize=18, titleFontSize=22)
+    # )
+    return chart.resolve_scale(color='independent')
 
 
 if __name__ == "__main__":
