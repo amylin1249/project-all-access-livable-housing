@@ -91,13 +91,13 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
             lookup="GEOID",
             from_=alt.LookupData(filtered_df, "tract", ["metric"]),
         )
-        .project(type="mercator", scale=120000, center=[-122.43, 37.77])
-        .properties(width="container", height=550)
-        .configure_view(stroke=None)
+        .project("albersUsa")
+        # .properties(width="container", height=550)
+        # .configure_view(stroke=None)
         .interactive()
     )
 
-    return background + chart.resolve_scale(color="independent")
+    return background + chart
 
 
 def create_reg_chart():
