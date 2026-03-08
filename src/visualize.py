@@ -4,7 +4,7 @@ import altair as alt
 from pathlib import Path
 
 from .datatypes import MERGED_SF_TRACTS_SHP, MERGED, CLEAN_ZILLOW
-from regression_analysis import run_reg
+from .regression_analysis import run_reg
 
 # from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
@@ -248,7 +248,7 @@ def create_encampments_scatterplot(tract_id: str):
             alt.Chart(filtered_df)
             .mark_line()
             .transform_fold(
-                fold= ["Structures", "Tents", "Vehicles"],
+                fold= ["structures", "tents", "vehicles"],
                 as_=["measurement", "value"],)
             .encode(
                 x=alt.X("date:T"),
