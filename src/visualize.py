@@ -37,12 +37,8 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
 
     merged_df["tract"] = merged_df["tract"].astype(str).str.zfill(11)
 
-    merged_df["date"] = pd.to_datetime(merged_df)
-    start_dt = pd.to_datetime(start_date)
-    end_dt = pd.to_datetime(end_date)
-
     filtered_df = (
-        merged_df[(merged_df["date"] >= start_dt) & (merged_df["date"] <= end_dt)]
+        merged_df[(merged_df["date"] >= start_date) & (merged_df["date"] <= end_date)]
         .drop(columns=["date"])
         .groupby("tract")
         .mean()
@@ -217,12 +213,7 @@ def create_reg_chart():
 
     return chart.resolve_scale(color="independent")
 
-<<<<<<< HEAD
-
-def homeless_scatterplot(tract_id: str):
-=======
 def create_homeless_scatterplot(source_file: Path, tract_id: str):
->>>>>>> 9534b9259e1cbea67485c841f29192975d5978f5
     """
     Add docstring
     """
@@ -243,13 +234,8 @@ def create_homeless_scatterplot(source_file: Path, tract_id: str):
     return chart
 
 
-<<<<<<< HEAD
-def encampments_scatterplot(tract_id: str):
-    df = pd.read_csv(MERGED)
-=======
 def create_encampments_scatterplot(source_file: Path, tract_id: str):
     df = pd.read_csv(source_file)
->>>>>>> 9534b9259e1cbea67485c841f29192975d5978f5
 
     df["tract"] = df["tract"].astype(str).str.zfill(11)
 
