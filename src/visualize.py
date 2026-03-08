@@ -8,9 +8,7 @@ from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 # from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
-def create_tract_map(
-    source_file: Path, start_date: str, end_date: str, col_name: str
-):
+def create_tract_map(source_file: Path, start_date: str, end_date: str, col_name: str):
     """
     Add docstring
     """
@@ -84,7 +82,6 @@ def create_reg_chart():
         ["Median Rent", "(Tract)"],
         ["Median Household", "Income (Tract)"],
         "Percentage White",
-        
         "Total Tents",
         "Total Structures",
         "Total Vehicles",
@@ -148,7 +145,8 @@ def create_reg_chart():
                     labelFontSize=10,
                     labelAngle=-30,
                     labelPadding=10,
-                ),),
+                ),
+            ),
             color=alt.condition(
                 alt.datum.significant,
                 alt.value("blue"),
@@ -156,10 +154,15 @@ def create_reg_chart():
             ),
             tooltip=[
                 alt.Tooltip("variable:N", title="Variable"),
-                alt.Tooltip("coefficient:Q", title="Coefficient (Unique 311 Reports)", format=".3f"),
+                alt.Tooltip(
+                    "coefficient:Q",
+                    title="Coefficient (Unique 311 Reports)",
+                    format=".3f",
+                ),
                 alt.Tooltip("significant:N", title="Significant"),
             ],
-        ))
+        )
+    )
 
     x_zero = (
         alt.Chart(pd.DataFrame({"x": [0]}))
@@ -174,7 +177,13 @@ def create_reg_chart():
             width="container",
             height=450,
             padding={"left": 10, "right": 10, "top": 20, "bottom": 20},
-            title=alt.Title(['Regression Analysis: Impact of Tract Features', 'on Total Number of Unique Reports'], fontSize=15),
+            title=alt.Title(
+                [
+                    "Regression Analysis: Impact of Tract Features",
+                    "on Total Number of Unique Reports",
+                ],
+                fontSize=15,
+            ),
         )
         .configure_axis(labelFontSize=18, titleFontSize=22)
     )
@@ -189,7 +198,7 @@ def create_reg_chart():
     #     .configure_axis(labelFontSize=18, titleFontSize=22)
     # )
     return chart.resolve_scale(color="independent")
-    
+
 
 def homeless_scatterplot(source_file: Path, tract_id: str):
     """
@@ -205,9 +214,7 @@ def homeless_scatterplot(source_file: Path, tract_id: str):
     chart = (
         alt.Chart(filtered_df)
         .mark_line(point=True)
-        .encode(
-            x=alt.X("date:T"),
-            y=alt.Y("estimate:Q"))
+        .encode(x=alt.X("date:T"), y=alt.Y("estimate:Q"))
         .properties(title="temporary title")
     )
 
@@ -222,20 +229,21 @@ def encampments_scatterplot(source_file: Path, tract_id: str):
     filtered_df = df[df["tract"] == tract_id]
 
     folded_chart = (
-            alt.Chart(filtered_df)
-            .mark_line()
-            .transform_fold(
-                fold= ["Structures", "Tents", "Vehicles"],
-                as_=["measurement", "value"],)
-            .encode(
-                x=alt.X("Date:T"),
-                y=alt.Y("value:Q"),
-                color=alt.Color("measurement:N"),
+        alt.Chart(filtered_df)
+        .mark_line()
+        .transform_fold(
+            fold=["Structures", "Tents", "Vehicles"],
+            as_=["measurement", "value"],
+        )
+        .encode(
+            x=alt.X("Date:T"),
+            y=alt.Y("value:Q"),
+            color=alt.Color("measurement:N"),
         )
     )
 
     return folded_chart
-    
+
 
 # def scatter_encamp(
 #     source_file: Path, start_date: str, end_date: str, col_name: str, agg: str = "mean"
@@ -258,12 +266,12 @@ def encampments_scatterplot(source_file: Path, tract_id: str):
 #                 "date": "Date",
 
 #             }
-#         )    
+#         )
 
 
 #     tract_select = alt.selection_point(
 #             fields=['Tract'],
-#             bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract') 
+#             bind=alt.binding_select(options=list(df['Tract'].unique()), name='Select Tract')
 #         )
 
 
@@ -292,4 +300,3 @@ if __name__ == "__main__":
     #     "median_rent",
     #     "mean",
     # )
-
