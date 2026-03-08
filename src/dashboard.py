@@ -16,7 +16,9 @@ my_chart = create_tract_map(
     col_name="eviction_rate",
 )
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH],suppress_callback_exceptions=True)
+app = Dash(
+    __name__, external_stylesheets=[dbc.themes.MORPH], suppress_callback_exceptions=True
+)
 
 app.layout = html.Div(
     [
@@ -27,7 +29,6 @@ app.layout = html.Div(
             style={"textAlign": "center", "color": "#2c3e50"},
         ),
         html.Br(),
-
         # [Description]
         html.Div(
             [
@@ -46,218 +47,402 @@ app.layout = html.Div(
             style={"padding": "10px 40px", "color": "#34495e"},
         ),
         # [basic number showing]
-        html.Div([
-            html.Div([html.B("Eviction Rate"), html.Br(), "###"], style={"flex": "1", "textAlign": "center"}),
-            html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-            html.Div([html.B("Average Rent"), html.Br(), "####"], style={"flex": "1", "textAlign": "center"}),
-            html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-            html.Div([html.B("311 Calls"), html.Br(), "###"], style={"flex": "1", "textAlign": "center"}),
-            html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
-            html.Div([html.B("Homelessness Estimate"), html.Br(), "###"], style={"flex": "1", "textAlign": "center"}),
-        ], style={
-            "display": "flex", "alignItems": "center", "padding": "20px", 
-            "margin": "20px 40px", "backgroundColor": "#f8f9fa", "borderRadius": "10px", "border": "1px solid #eee"
-        }),
+        html.Div(
+            [
+                html.Div(
+                    [html.B("Eviction Rate"), html.Br(), "###"],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [html.B("Average Rent"), html.Br(), "####"],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [html.B("311 Calls"), html.Br(), "###"],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+                html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+                html.Div(
+                    [html.B("Homelessness Estimate"), html.Br(), "###"],
+                    style={"flex": "1", "textAlign": "center"},
+                ),
+            ],
+            style={
+                "display": "flex",
+                "alignItems": "center",
+                "padding": "20px",
+                "margin": "20px 40px",
+                "backgroundColor": "#f8f9fa",
+                "borderRadius": "10px",
+                "border": "1px solid #eee",
+            },
+        ),
         # [Tabs]
-        dcc.Tabs(id="tabs-content", value='tab-map', children=[
-            dcc.Tab(label='Geospatial Map', value='tab-map'),
-            dcc.Tab(label='Regression Analysis', value='tab-reg'),
-            dcc.Tab(label='Rent', value='tab-rent'),
-            dcc.Tab(label='Homeless', value='tab-homeless'),
-        ], style={"margin": "20px 40px"}),
-
+        dcc.Tabs(
+            id="tabs-content",
+            value="tab-map",
+            children=[
+                dcc.Tab(label="Geospatial Map", value="tab-map"),
+                dcc.Tab(label="Regression Analysis", value="tab-reg"),
+                dcc.Tab(label="Rent", value="tab-rent"),
+                dcc.Tab(label="Homeless", value="tab-homeless"),
+            ],
+            style={"margin": "20px 40px"},
+        ),
         # [Content Container]
-        html.Div(id='tabs-content-container', style={"padding": "0 40px"})
-    ],style={"maxWidth": "1600px", "margin": "0 auto", "boxSizing": "border-box"})
-
-@app.callback(
-    Output('tabs-content-container', 'children'),
-    Input('tabs-content', 'value')
+        html.Div(id="tabs-content-container", style={"padding": "0 40px"}),
+    ],
+    style={"maxWidth": "1600px", "margin": "0 auto", "boxSizing": "border-box"},
 )
 
+
+@app.callback(
+    Output("tabs-content-container", "children"), Input("tabs-content", "value")
+)
 def render_content(tab):
     # [tab 1. map]
-    if tab == 'tab-map':
-        return html.Div([
-            html.Div([
-                html.Div([
-                    html.B("Instruction: "),
-                    "Use the ", html.B("dropdown"),
-                    " and ", html.B("date selectors"),
-                    " below to select your metric and time period of interest. The ",
-                    html.B("map"),
-                    " will update automatically based on your selection."
-                ], style={"fontSize": "16px", "lineHeight": "1.5", "marginBottom": "20px"}),
-
-                # Metric Dropdown
-                html.Label("Select Metric:"),
-                dcc.Dropdown(
-                    id="column-dropdown",
-                    options=[
-                        {"label": "Homeless Population Estimate", "value": "estimate"},
-                        {"label": "Eviction Rate", "value": "eviction_rate"},
-                        {"label": "Median Rent", "value": "median_rent"},
-                        {"label": "Citizen-Reported Encampments (311 Calls)", "value": "311_calls"},
-                        {"label": "Official City Tent Count", "value": "tents"},
-                        {"label": "Official City Structure Count", "value": "structures"},
-                        {"label": "Official City Lived-in Vehicle Count", "value": "vehicles"},
+    if tab == "tab-map":
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.B("Instruction: "),
+                                "Use the ",
+                                html.B("dropdown"),
+                                " and ",
+                                html.B("date selectors"),
+                                " below to select your metric and time period of interest. The ",
+                                html.B("map"),
+                                " will update automatically based on your selection.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        # Metric Dropdown
+                        html.Label("Select Metric:"),
+                        dcc.Dropdown(
+                            id="column-dropdown",
+                            options=[
+                                {
+                                    "label": "Homeless Population Estimate",
+                                    "value": "estimate",
+                                },
+                                {"label": "Eviction Rate", "value": "eviction_rate"},
+                                {"label": "Median Rent", "value": "median_rent"},
+                                {
+                                    "label": "Citizen-Reported Encampments (311 Calls)",
+                                    "value": "311_calls",
+                                },
+                                {"label": "Official City Tent Count", "value": "tents"},
+                                {
+                                    "label": "Official City Structure Count",
+                                    "value": "structures",
+                                },
+                                {
+                                    "label": "Official City Lived-in Vehicle Count",
+                                    "value": "vehicles",
+                                },
+                            ],
+                            value="estimate",
+                        ),
+                        html.Br(),
+                        # Date Selectors
+                        html.Div(
+                            [
+                                # Start Period
+                                html.Div(
+                                    [
+                                        html.Label("Start Period:"),
+                                        dcc.Dropdown(
+                                            id="start-month",
+                                            options=[
+                                                {
+                                                    "label": calendar.month_name[m],
+                                                    "value": f"{m:02d}",
+                                                }
+                                                for m in range(1, 13)
+                                            ],
+                                            value="01",
+                                            style={
+                                                "width": "150px",
+                                                "display": "inline-block",
+                                                "marginLeft": "10px",
+                                            },
+                                        ),
+                                        dcc.Dropdown(
+                                            id="start-year",
+                                            options=[
+                                                {"label": str(y), "value": str(y)}
+                                                for y in range(2020, 2025)
+                                            ],
+                                            value="2020",
+                                            style={
+                                                "width": "120px",
+                                                "display": "inline-block",
+                                            },
+                                        ),
+                                    ],
+                                    style={"display": "inline-block"},
+                                ),
+                                # End Period
+                                html.Div(
+                                    [
+                                        html.Label(
+                                            "End Period:", style={"marginLeft": "30px"}
+                                        ),
+                                        dcc.Dropdown(
+                                            id="end-month",
+                                            options=[
+                                                {
+                                                    "label": calendar.month_name[m],
+                                                    "value": f"{m:02d}",
+                                                }
+                                                for m in range(1, 13)
+                                            ],
+                                            value="12",
+                                            style={
+                                                "width": "150px",
+                                                "display": "inline-block",
+                                                "marginLeft": "10px",
+                                            },
+                                        ),
+                                        dcc.Dropdown(
+                                            id="end-year",
+                                            options=[
+                                                {"label": str(y), "value": str(y)}
+                                                for y in range(2020, 2025)
+                                            ],
+                                            value="2024",
+                                            style={
+                                                "width": "120px",
+                                                "display": "inline-block",
+                                                "marginLeft": "10px",
+                                            },
+                                        ),
+                                    ],
+                                    style={"display": "inline-block"},
+                                ),
+                            ]
+                        ),
                     ],
-                    value="estimate",
+                    style={
+                        "padding": "20px",
+                        "backgroundColor": "#f9f9f9",
+                        "borderRadius": "10px",
+                        "marginBottom": "20px",
+                    },
                 ),
-                html.Br(),
-
-                # Date Selectors
-                html.Div([
-                    # Start Period
-                    html.Div([
-                        html.Label("Start Period:"),
-                        dcc.Dropdown(
-                            id="start-month",
-                            options=[{"label": calendar.month_name[m], "value": f"{m:02d}"} for m in range(1, 13)],
-                            value="01",
-                            style={"width": "150px", "display": "inline-block", "marginLeft": "10px"},
+                # map
+                html.Div(
+                    [
+                        html.H3(
+                            id="map-title",
+                            style={
+                                "textAlign": "center",
+                                "color": "#2c3e50",
+                                "marginBottom": "15px",
+                            },
                         ),
-                        dcc.Dropdown(
-                            id="start-year",
-                            options=[{"label": str(y), "value": str(y)} for y in range(2020, 2025)],
-                            value="2020",
-                            style={"width": "120px", "display": "inline-block"},
+                        html.Hr(),
+                        dvc.Vega(
+                            id="sf-map",
+                            spec={},
+                            style={
+                                "width": "100%",
+                                "height": "600px",
+                                "borderRadius": "10px",
+                            },
                         ),
-                    ], style={"display": "inline-block"}),
-
-                    # End Period
-                    html.Div([
-                        html.Label("End Period:", style={"marginLeft": "30px"}),
-                        dcc.Dropdown(
-                            id="end-month",
-                            options=[{"label": calendar.month_name[m], "value": f"{m:02d}"} for m in range(1, 13)],
-                            value="12",
-                            style={"width": "150px", "display": "inline-block", "marginLeft": "10px"},
-                        ),
-                        dcc.Dropdown(
-                            id="end-year",
-                            options=[{"label": str(y), "value": str(y)} for y in range(2020, 2025)],
-                            value="2024",
-                            style={"width": "120px", "display": "inline-block", "marginLeft": "10px"},
-                        ),
-                    ], style={"display": "inline-block"}),
-                ]),
-            ], style={"padding": "20px", "backgroundColor": "#f9f9f9", "borderRadius": "10px", "marginBottom": "20px"}),
-
-            # map
-            html.Div([
-                html.H3(id="map-title", style={"textAlign": "center", "color": "#2c3e50", "marginBottom": "15px"}),
-                html.Hr(),
-                dvc.Vega(
-                    id="sf-map",
-                    spec={},
-                    style={"width": "100%", "height": "600px", "borderRadius": "10px"},
+                    ],
+                    style={
+                        "width": "100%",
+                        "padding": "20px",
+                        "border": "1px solid #ddd",
+                        "borderRadius": "10px",
+                        "backgroundColor": "white",
+                        "boxSizing": "border-box",
+                    },
                 ),
-            ], style={
-                "width": "100%", 
-                "padding": "20px",
-                "border": "1px solid #ddd",
-                "borderRadius": "10px",
-                "backgroundColor": "white",
-                "boxSizing": "border-box",
-            }),
-        ])
-    
+            ]
+        )
+
     # [tab 2.regression]
-    elif tab == 'tab-reg':
-        return html.Div([
-            html.Div([
-                html.H3(
-                    id="regression-title",
-                    style={"textAlign": "center", "color": "#2c3e50"},
-                    ),
-                html.Hr(),
-                dvc.Vega(
-                    id="reg-chart",
-                    spec={},
-                    style={"width": "100%", "height": "500px"},
+    elif tab == "tab-reg":
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.H3(
+                            id="regression-title",
+                            style={"textAlign": "center", "color": "#2c3e50"},
+                        ),
+                        html.Hr(),
+                        dvc.Vega(
+                            id="reg-chart",
+                            spec={},
+                            style={"width": "100%", "height": "500px"},
+                        ),
+                    ],
+                    style={
+                        "width": "100%",
+                        "padding": "20px",
+                        "marginLeft": "20px",
+                        "border": "1px solid #ddd",
+                        "borderRadius": "10px",
+                        "backgroundColor": "white",
+                    },
                 ),
-            ],style={
-                "width": "100%",
-                "padding": "20px",
-                "marginLeft": "20px",
-                "border": "1px solid #ddd",
-                "borderRadius": "10px",
-                "backgroundColor": "white",
-            }),
             ],
             style={
                 "display": "flex",
                 "flexDirection": "row",
                 "alignItems": "flex-start",
                 "padding": "10px",
-            })
-#         ),
-#     ],
-#     style={"maxWidth": "1200px", "margin": "0 auto"},
-# )
+            },
+        )
+    #         ),
+    #     ],
+    #     style={"maxWidth": "1200px", "margin": "0 auto"},
+    # )
     # [tab 3. Rent Scatter Plot]
-    elif tab == 'tab-scatter':
-        return html.Div([
-            html.Div([
-                html.Div([
-                    html.B("Instruction: "),
-                    "Explore the correlation between ", html.B("####"), " and ", html.B("#####"), 
-                    ". Select a specific metric to update the scatter plot."
-                ], style={"fontSize": "16px", "lineHeight": "1.5", "marginBottom": "20px"}),
-
-                # dropdown
-                html.Label("Select Zip-code:", style={"fontWeight": "bold"}),
-                dcc.Dropdown(
-                    id="scatter-metric-dropdown",
-                    options=[
-                        {"label": "Median Rent", "value": "median_rent"},
-                       # {"label": "Time", "value": "start_date"},
+    elif tab == "tab-scatter":
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.B("Instruction: "),
+                                "Explore the correlation between ",
+                                html.B("####"),
+                                " and ",
+                                html.B("#####"),
+                                ". Select a specific metric to update the scatter plot.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        # dropdown
+                        html.Label("Select Zip-code:", style={"fontWeight": "bold"}),
+                        dcc.Dropdown(
+                            id="scatter-metric-dropdown",
+                            options=[
+                                {"label": "Median Rent", "value": "median_rent"},
+                                # {"label": "Time", "value": "start_date"},
+                            ],
+                            value="estimate",
+                        ),
                     ],
-                    value="estimate",
+                    style={
+                        "padding": "20px",
+                        "backgroundColor": "#f9f9f9",
+                        "borderRadius": "10px",
+                        "marginBottom": "20px",
+                    },
                 ),
-            ], style={"padding": "20px", "backgroundColor": "#f9f9f9", "borderRadius": "10px", "marginBottom": "20px"}),
-
-            # scatter plot
-            html.Div([
-                html.H3("### vs. ### Correlation", style={"textAlign": "center"}),
-                html.Hr(),
-                dvc.Vega(
-                    id="rent-scatter-plot",
-                    spec={},
-                    style={"width": "100%", "height": "500px"},
+                # scatter plot
+                html.Div(
+                    [
+                        html.H3(
+                            "### vs. ### Correlation", style={"textAlign": "center"}
+                        ),
+                        html.Hr(),
+                        dvc.Vega(
+                            id="rent-scatter-plot",
+                            spec={},
+                            style={"width": "100%", "height": "500px"},
+                        ),
+                    ],
+                    style={
+                        "padding": "20px",
+                        "border": "1px solid #ddd",
+                        "borderRadius": "10px",
+                        "backgroundColor": "white",
+                    },
                 ),
-            ], style={"padding": "20px", "border": "1px solid #ddd", "borderRadius": "10px", "backgroundColor": "white"})
-        ])
+            ]
+        )
 
     # [tab 4. homeless scatter plot]
     else:
-        return html.Div([
-            html.Div([
-                html.B("Analysis: "), "Homelessness estimate : tents + vehicles + structures"
-            ], style={"padding": "20px", "backgroundColor": "#f1f3f5", "borderRadius": "10px", "marginBottom": "20px"}),
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.B("Analysis: "),
+                        "Homelessness estimate : tents + vehicles + structures",
+                    ],
+                    style={
+                        "padding": "20px",
+                        "backgroundColor": "#f1f3f5",
+                        "borderRadius": "10px",
+                        "marginBottom": "20px",
+                    },
+                ),
+                # scatter plots
+                html.Div(
+                    [
+                        # left
+                        html.Div(
+                            [
+                                html.H4("## vs. ##", style={"textAlign": "center"}),
+                                dvc.Vega(
+                                    id="homeless-1",
+                                    spec={},
+                                    style={"width": "100%", "height": "400px"},
+                                ),
+                            ],
+                            style={
+                                "width": "48%",
+                                "padding": "10px",
+                                "border": "1px solid #eee",
+                                "borderRadius": "10px",
+                            },
+                        ),
+                        # right
+                        html.Div(
+                            [
+                                html.H4("## vs. ##", style={"textAlign": "center"}),
+                                dvc.Vega(
+                                    id="homeless-2",
+                                    spec={},
+                                    style={"width": "100%", "height": "400px"},
+                                ),
+                            ],
+                            style={
+                                "width": "48%",
+                                "padding": "10px",
+                                "border": "1px solid #eee",
+                                "borderRadius": "10px",
+                                "marginLeft": "4%",
+                            },
+                        ),
+                    ],
+                    style={
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                    },
+                ),
+            ]
+        )
 
-            # scatter plots
-            html.Div([
-                # left
-                html.Div([
-                    html.H4("## vs. ##", style={"textAlign": "center"}),
-                    dvc.Vega(id="homeless-1", spec={}, style={"width": "100%", "height": "400px"}),
-                ], style={"width": "48%", "padding": "10px", "border": "1px solid #eee", "borderRadius": "10px"}),
-                
-                # right
-                html.Div([
-                    html.H4("## vs. ##", style={"textAlign": "center"}),
-                    dvc.Vega(id="homeless-2", spec={}, style={"width": "100%", "height": "400px"}),
-                ], style={"width": "48%", "padding": "10px", "border": "1px solid #eee", "borderRadius": "10px", "marginLeft": "4%"}),
-            ], style={"display": "flex", "flexDirection": "row", "justifyContent": "center"})
-        ])
 
 @app.callback(
     [
         Output("sf-map", "spec"),  # update
         Output("map-title", "children"),  # title-map
-    ], 
+    ],
     [
         Input("column-dropdown", "value"),  # change in column
         Input("start-year", "value"),  # change in start-date
@@ -266,7 +451,6 @@ def render_content(tab):
         Input("end-month", "value"),
     ],
 )
-
 def update_map(selected_col, start_year, start_month, end_year, end_month):
     if any(
         v is None for v in [selected_col, start_year, start_month, end_year, end_month]
@@ -294,26 +478,26 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
         start_date=start_dt,
         end_date=end_dt,
         col_name=selected_col,
-        #agg="mean",
+        # agg="mean",
     )
 
     map_title = f"Average {METRIC_NAMES[selected_col].lower()} in SF tracts ({start_year}-{start_month} to {end_year}-{end_month})"
-    
+
     return map_chart.to_dict(), map_title
+
 
 @app.callback(
     [
         Output("reg-chart", "spec"),  # update
-        Output("regression-title", "children"),# title-regression
-    ],  
+        Output("regression-title", "children"),  # title-regression
+    ],
     [
         Input("tabs-content", "value"),  # change in column
     ],
 )
-
 def update_regression(tab_value):
 
-    if tab_value != 'tab-reg':
+    if tab_value != "tab-reg":
         raise dash.exceptions.PreventUpdate
 
     new_reg = create_reg_chart()
@@ -321,22 +505,17 @@ def update_regression(tab_value):
 
     return new_reg.to_dict(), reg_title
 
-@app.callback(
-    Output("rent-scatter-plot", "spec"),
-    [Input("tabs-content", "value")]
-)
+
+@app.callback(Output("rent-scatter-plot", "spec"), [Input("tabs-content", "value")])
 def update_rent_scatter(tab_value):
-    if tab_value != 'tab-rent':
+    if tab_value != "tab-rent":
         raise dash.exceptions.PreventUpdate
     return {}
 
 
-@app.callback(
-    Output("homeless-scatter-plot", "spec"),
-    [Input("tabs-content", "value")]
-)
+@app.callback(Output("homeless-scatter-plot", "spec"), [Input("tabs-content", "value")])
 def update_homeless_scatter(tab_value):
-    if tab_value != 'tab-homeless':
+    if tab_value != "tab-homeless":
         raise dash.exceptions.PreventUpdate
     return {}
 
