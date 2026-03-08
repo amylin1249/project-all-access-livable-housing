@@ -3,16 +3,24 @@ import geopandas as gpd
 import altair as alt
 from pathlib import Path
 
-from datatypes import MERGED_SF_TRACTS_SHP, MERGED
+from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 # from .datatypes import MERGED_SF_TRACTS_SHP, MERGED
 
 
-def create_tract_map(
-    source_file: Path, start_date: str, end_date: str, col_name: str
-):
+def create_tract_map(start_date: str, end_date: str, col_name: str):
     """
-    Add docstring
+    Create Altair choropleth map of SF tracts based on a specified metric
+    averaged given a start date and end date.
+
+    Parameters:
+        start_date: Start date for analysis
+        end_date: End date for analysis
+        col_name: Column name for preferred metric of analysis
+
+    Returns:
+        An Altair choropleth map across SF tracts for the given metric and time
+        period for analysis
     """
     METRIC_NAMES = {
         "311_calls": "311 calls",
@@ -24,28 +32,53 @@ def create_tract_map(
         "estimate": "Homelessness estimate",
     }
 
-    df = pd.read_csv(source_file)
-    sf_tracts = gpd.read_file(MERGED_SF_TRACTS_SHP)
-    ### TBD ON WHETHER THIS SHOULD BE INSIDE OR OUTSIDE FUNCTION
+    merged_df = pd.read_csv(MERGED)
+    tracts_gdf = gpd.read_file(MERGED_SF_TRACTS_SHP)
 
-    df["tract"] = df["tract"].astype(str).str.zfill(11)
-    df["date"] = pd.to_datetime(df["date"])
+    merged_df["tract"] = merged_df["tract"].astype(str).str.zfill(11)
+
+    merged_df["date"] = pd.to_datetime(merged_df)
     start_dt = pd.to_datetime(start_date)
     end_dt = pd.to_datetime(end_date)
 
     filtered_df = (
-        df[(df["date"] >= start_dt) & (df["date"] <= end_dt)]
+        merged_df[(merged_df["date"] >= start_dt) & (merged_df["date"] <= end_dt)]
+        .drop(columns=["date"])
         .groupby("tract")
-        .agg(metric=(col_name, "mean"))
+        .mean()
         .reset_index()
     )
 
+    # Merge aggregated dataframe with GeoDataFrame
+    merged_tracts_gdf = tracts_gdf.merge(filtered_df, left_on="GEOID", right_on="tract", how="left")
+
+    # Create tooltips, and add last tooltip only if selected column name is not one of the existing tooltips
+    tooltips = [
+        alt.Tooltip("GEOID:N", title="Tract ID"),
+        alt.Tooltip("population:Q", title="Population"),
+        alt.Tooltip("median_rent:Q", format=",.0f", title="Median rent (per month)"),
+        alt.Tooltip("eviction_rate:Q", format=".3%", title="Average eviction rate"),
+        alt.Tooltip("estimate:Q", format=",.0f", title="Average homeless population estimate"),
+        alt.Tooltip("311_calls:Q", format=",.0f", title="Average monthly citizen-reported encampments")
+    ]
+
+    if col_name in ["tents", "structures", "vehicles"]:
+        tooltips.append(alt.Tooltip(f"{col_name}:Q", format=",.0f", title=f"Average {METRIC_NAMES[col_name].lower()}"))
+
+    # Create base map for tracts with no data
+    background = (
+        alt.Chart(tracts_gdf)
+        .mark_geoshape(fill="lightgray", stroke="white")
+        .project("albersUsa")
+    )
+
+    # Build interactive choropleth map
     chart = (
-        alt.Chart(sf_tracts)
+        alt.Chart(merged_tracts_gdf)
         .mark_geoshape(stroke="black", strokeWidth=0.5)
         .encode(
             color=alt.Color(
-                "metric:Q",
+                f"{col_name}:Q",
                 title=METRIC_NAMES[col_name],
                 legend=alt.Legend(
                     orient="right",
@@ -55,16 +88,7 @@ def create_tract_map(
                     offset=10,
                 ),
             ),
-            tooltip=[
-                alt.Tooltip("GEOID:N", title="Tract ID"),
-                alt.Tooltip("population:Q", title="Population"),
-                alt.Tooltip("med_hh_inc:Q", title="Median annual household income"),
-                alt.Tooltip("white_pct:Q", title="% white population"),
-                alt.Tooltip(
-                    "metric:Q",
-                    title=f"Monthly average {METRIC_NAMES[col_name].lower()}",
-                ),
-            ],
+            tooltip=tooltips
         )
         .transform_lookup(
             lookup="GEOID",
@@ -75,6 +99,7 @@ def create_tract_map(
         .configure_view(stroke=None)
         .interactive()
     )
+
     return chart.resolve_scale(color="independent")
 
 
