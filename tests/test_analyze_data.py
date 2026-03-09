@@ -1,6 +1,15 @@
 import pandas as pd
 import pytest
-from src.analyze_data import count_evictions_by_tract, calculate_eviction_rate
+import os
+from src.analyze_data import (
+    count_evictions_by_tract,
+    calculate_eviction_rate,
+    generate_tidy_csv,
+    MERGED,
+    TENTS_EST,
+    STRUCTURES_EST,
+    VEHICLES_EST,
+)
 
 
 def test_total_evictions_format():
@@ -42,3 +51,44 @@ def test_calculate_eviction_rate_math():
             or sample["eviction_rate"] == 0
             or sample["eviction_rate"] == float("inf")
         )
+
+
+@pytest.fixture(scope="module")
+def merged_data():
+    generate_tidy_csv()
+    df = pd.read_csv(MERGED)
+    return df
+
+
+def test_tidy_col_num(processed_data):
+    expected_columns = [
+        "date",
+        "tract",
+        "median_rent",
+        "eviction_rate",
+        "311_calls",
+        "tents",
+        "structures",
+        "vehicles",
+        "estimate",
+    ]
+    actual_columns = processed_data.columns.tolist()
+
+    assert len(actual_columns) == len(expected_columns)
+
+    for col in expected_columns:
+        assert col in actual_columns
+
+
+def test_homelessness_estimate_calculation(processed_data):
+    sample = processed_data.iloc[0]
+    expected_estimate = (
+        sample["tents"] * TENTS_EST
+        + sample["structures"] * STRUCTURES_EST
+        + sample["vehicles"] * VEHICLES_EST
+    )
+    assert sample["estimate"] == pytest.approx(expected_estimate)
+
+
+def test_tidy_csv_exists():
+    assert os.path.exists(MERGED)
