@@ -22,7 +22,7 @@ Overall, our project has a strong focus on spatial analysis and mapping, visuali
 
 
 ## Instructions to our project 
-1. Clone our repository by running git clone <SSH> in your terminal.
+1. Clone our repository by running `git clone git@github.com:uchicago-2026-capp30122/project-all-access-livable-housing.git` in your terminal.
 2. After cloning the repository, run `uv sync` in the project root directory to install the required packages and set up the virtual environment.
 3. *[Optional -- these files should already be included in the repository]* To retrieve API data and regenerate the clean data files, run `uv run python -m src --data` in the root directory. This will take around 3 minutes to run.
 4. To launch our interactive dashboard and visualizations, run `uv run python -m src --dashboard` in the root directory.
