@@ -25,8 +25,12 @@ Sources of data
 
 Key gaps or challenges include: 
 - #1 DataSF Open Data Portal:
+    - Encampments: Interpolating data
+    - 311: deduplicating
 - #2 Census Data: Negative values were present in a few tracts for metrics such as rent and household income, requiring us to manually impute these values with the mean of the positive values in the dataset.
-- #4 HUD Crosswalks: 
+- #3 Zillow: Missing data
+- #4 HUD Crosswalks: Inconsistently named columns, separated excel files, missing data
+
 
 The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to Census Tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
 
