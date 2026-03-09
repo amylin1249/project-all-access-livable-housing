@@ -123,9 +123,9 @@ app.layout = html.Div(
             value="tab-map",
             children=[
                 dcc.Tab(label="Geospatial Map", value="tab-map"),
-                dcc.Tab(label="Regression Analysis of 311 Calls", value="tab-reg"),
+                dcc.Tab(label="Street Homeless Population Estimate", value="tab-homeless"),
                 dcc.Tab(label="Median Monthly Rent", value="tab-rent"),
-                dcc.Tab(label="Street Homeless Population Estimate"),
+                dcc.Tab(label="Regression Analysis of 311 Calls", value="tab-reg"),
             ],
             style={"margin": "20px 40px"},
         ),
@@ -341,154 +341,8 @@ def render_content(tab):
             ]
         )
     
-    #[tab2. reg]
-    if tab == "tab-reg":
-        return html.Div([
-            html.Div([
-                html.Div([
-                    html.B("How does the number of citizen-reported encampments (311 calls) correlate with tract-level characteristics?"),
-                ], style={
-                                "fontSize": "20px",
-                                "lineHeight": "1",
-                                "marginBottom": "20px",
-                                "textAlign": "center",
-                        }),
-            ], style={
-                "padding": "30px", 
-                "backgroundColor": "#f9f9f9", 
-                "borderRadius": "10px", 
-                "marginBottom": "20px", 
-                "border": "1px solid #ddd"  
-            }),
-
-            
-            html.Div([
-                 html.Div([
-                    # explaination
-                    html.P(
-                        "We ran a regression to examine how tract-level characteristics are associated with the number of encampments reported through 311 service calls (e.g., the number of encampments that citizens reported to the City of San Francisco by calling the 311 service number). For each month with official city encampment counts, we matched those counts to the total number of 311 calls for encampments for that month, along with tract-level demographic and socioeconomic characteristics from the ACS.",
-                        style={"marginBottom": "15px"},
-                    ),
-                    html.P(
-                        "The regression included month fixed effects. The results indicate that median household income and median monthly rent are not significantly associated with the number of citizen reports via 311 calls. However, a tract's racial composition appears to be related to reporting behavior among residents: for every 10-percentage-point increase in the share of tract residents who are white, approximately 1 additional encampment location is reported per month. Note that we de-duplicated the data, such that calls for the same address or latitude and longitude were only counted once.",
-                        style={"marginBottom": "15px"},
-                    ),
-                    html.P(
-                        "Certain encampment characteristics are also strongly associated with reporting. For every 0.94 additional tents observed in the official city count, approximately 1 additional encampment location is reported per month. And for every 0.64 additional structures observed in the official city count, approximately 1 additional encampment location is reported per month. In contrast, the number of lived-in vehicles in the official city count has no clear relationship with the number of 311 calls. One possible explanation is that lived-in vehicles blend more easily into the surrounding environment, and therefore, citizens may not perceive them as a homeless encampment."),
-                    # regression
-                    dvc.Vega(
-                        id="reg-chart", 
-                        spec={}, 
-                        style={"width": "100%", "height": "500px"}
-                    ),
-                ], style={
-                    "padding": "25px", 
-                    "border": "1px solid #eee", 
-                    "borderRadius": "10px", 
-                    "backgroundColor": "#fff", 
-                    "lineHeight": "1.6"
-                })
-            ], style={
-                "padding": "25px", 
-                "border": "1px solid #ddd", 
-                "borderRadius": "10px", 
-                "backgroundColor": "white",
-                "boxShadow": "0 2px 4px rgba(0,0,0,0.05)"
-            })
-        ])
-
-
-    # [tab 3. Rent Scatter Plot]
-    elif tab == "tab-rent":
-        return html.Div(
-            [
-                html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.B(
-                                    "How has the monthly rent in my neighborhood changed over time?"
-                                ),
-                                html.Br(),
-                                html.B(
-                                    "What was the impact of the COVID-19 pandemic on rents?"
-                                ),
-                            ],
-                            style={
-                                "fontSize": "20px",
-                                "lineHeight": "1",
-                                "marginBottom": "20px",
-                                "textAlign": "center",
-                            },
-                        ),
-                        html.Div(
-                            [
-                                "These questions can be answered using the ",
-                                html.B("interactive scatterplot"),
-                                " below.",
-                            ],
-                            style={
-                                "fontSize": "16px",
-                                "lineHeight": "1.5",
-                                "marginBottom": "20px",
-                            },
-                        ),
-                        html.Div(
-                            [
-                                html.B("How to use: "),
-                                "Select your ",
-                                html.B("zip code"),
-                                " from the ",
-                                html.B("dropdown menu"),
-                                " below. The graph will automatically update based on your selection.",
-                            ],
-                            style={
-                                "fontSize": "16px",
-                                "lineHeight": "1.5",
-                                "marginBottom": "20px",
-                            },
-                        ),
-                        # dropdown
-                        html.Label("Select Zip Code:"),
-                        dcc.Dropdown(
-                            id="zip-dropdown",
-                            options=[
-                                {"label": str(z), "value": str(z)} for z in all_zips
-                            ],
-                            value="94158",
-                            clearable=False,
-                        ),
-                    ],
-                    style={
-                        "padding": "20px",
-                        "backgroundColor":"white",
-                        "borderRadius": "10px",
-                        "marginBottom": "20px",
-                    },
-                ),
-                # scatter plot
-                html.Div(
-                    [
-                        html.H3(id="rent-plot-title", style={"textAlign": "center"}),
-                        html.Hr(),
-                        dvc.Vega(
-                            id="rent-scatter-plot",
-                            spec={},
-                            style={"width": "100%", "height": "500px"},
-                        ),
-                    ],
-                    style={
-                        "padding": "20px",
-                        "border": "1px solid #ddd",
-                        "borderRadius": "10px",
-                        "backgroundColor": "white",
-                    },
-                ),
-            ]
-        )
-
-    # [tab 4. homeless scatter plot]
-    else:
+    #[tab2. homeless]
+    if tab == "tab-homeless":
         return html.Div(
             [
                 html.Div(
@@ -612,6 +466,155 @@ def render_content(tab):
         )
 
 
+
+    # [tab 3. Rent Scatter Plot]
+    elif tab == "tab-rent":
+        return html.Div(
+            [
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.B(
+                                    "How has the monthly rent in my neighborhood changed over time?"
+                                ),
+                                html.Br(),
+                                html.B(
+                                    "What was the impact of the COVID-19 pandemic on rents?"
+                                ),
+                            ],
+                            style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                "These questions can be answered using the ",
+                                html.B("interactive scatterplot"),
+                                " below.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        html.Div(
+                            [
+                                html.B("How to use: "),
+                                "Select your ",
+                                html.B("zip code"),
+                                " from the ",
+                                html.B("dropdown menu"),
+                                " below. The graph will automatically update based on your selection.",
+                            ],
+                            style={
+                                "fontSize": "16px",
+                                "lineHeight": "1.5",
+                                "marginBottom": "20px",
+                            },
+                        ),
+                        # dropdown
+                        html.Label("Select Zip Code:"),
+                        dcc.Dropdown(
+                            id="zip-dropdown",
+                            options=[
+                                {"label": str(z), "value": str(z)} for z in all_zips
+                            ],
+                            value="94158",
+                            clearable=False,
+                        ),
+                    ],
+                    style={
+                        "padding": "20px",
+                        "backgroundColor":"white",
+                        "borderRadius": "10px",
+                        "marginBottom": "20px",
+                    },
+                ),
+                # scatter plot
+                html.Div(
+                    [
+                        html.H3(id="rent-plot-title", style={"textAlign": "center"}),
+                        html.Hr(),
+                        dvc.Vega(
+                            id="rent-scatter-plot",
+                            spec={},
+                            style={"width": "100%", "height": "500px"},
+                        ),
+                    ],
+                    style={
+                        "padding": "20px",
+                        "border": "1px solid #ddd",
+                        "borderRadius": "10px",
+                        "backgroundColor": "white",
+                    },
+                ),
+            ]
+        )
+
+    # [tab 4. reg]
+    else:
+        return html.Div([
+            html.Div([
+                html.Div([
+                    html.B("How does the number of citizen-reported encampments (311 calls) correlate with tract-level characteristics?"),
+                ], style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                        }),
+            ], style={
+                "padding": "30px", 
+                "backgroundColor": "#f9f9f9", 
+                "borderRadius": "10px", 
+                "marginBottom": "20px", 
+                "border": "1px solid #ddd"  
+            }),
+
+            
+            html.Div([
+                 html.Div([
+                    # explaination
+                    html.P(
+                        "We ran a regression to examine how tract-level characteristics are associated with the number of encampments reported through 311 service calls (e.g., the number of encampments that citizens reported to the City of San Francisco by calling the 311 service number). For each month with official city encampment counts, we matched those counts to the total number of 311 calls for encampments for that month, along with tract-level demographic and socioeconomic characteristics from the ACS.",
+                        style={"marginBottom": "15px"},
+                    ),
+                    html.P(
+                        "The regression included month fixed effects. The results indicate that median household income and median monthly rent are not significantly associated with the number of citizen reports via 311 calls. However, a tract's racial composition appears to be related to reporting behavior among residents: for every 10-percentage-point increase in the share of tract residents who are white, approximately 1 additional encampment location is reported per month. Note that we de-duplicated the data, such that calls for the same address or latitude and longitude were only counted once.",
+                        style={"marginBottom": "15px"},
+                    ),
+                    html.P(
+                        "Certain encampment characteristics are also strongly associated with reporting. For every 0.94 additional tents observed in the official city count, approximately 1 additional encampment location is reported per month. And for every 0.64 additional structures observed in the official city count, approximately 1 additional encampment location is reported per month. In contrast, the number of lived-in vehicles in the official city count has no clear relationship with the number of 311 calls. One possible explanation is that lived-in vehicles blend more easily into the surrounding environment, and therefore, citizens may not perceive them as a homeless encampment."),
+                    # regression
+                    dvc.Vega(
+                        id="reg-chart", 
+                        spec={}, 
+                        style={"width": "100%", "height": "500px"}
+                    ),
+                ], style={
+                    "padding": "25px", 
+                    "border": "1px solid #eee", 
+                    "borderRadius": "10px", 
+                    "backgroundColor": "#fff", 
+                    "lineHeight": "1.6"
+                })
+            ], style={
+                "padding": "25px", 
+                "border": "1px solid #ddd", 
+                "borderRadius": "10px", 
+                "backgroundColor": "white",
+                "boxShadow": "0 2px 4px rgba(0,0,0,0.05)"
+            })
+        ])
+
+        
+
+
 # tab1 : map
 @app.callback(
     [
@@ -675,42 +678,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
 
     return map_chart.to_dict(), map_title
 
-
-# tab2 :regression
-@app.callback(
-    [
-        Output("reg-chart", "spec"),  # update
-                ],
-    [
-        Input("tabs-content", "value"),  # change in column
-    ],
-)
-def update_regression(tab_value):
-
-    if tab_value != "tab-reg":
-        raise exceptions.PreventUpdate
-
-    new_reg = create_reg_chart()
-
-    return [new_reg.to_dict()]
-
-
-# tab3 : rent scatterplot
-@app.callback(
-    [Output("rent-scatter-plot", "spec"), Output("rent-plot-title", "children")],
-    [Input("tabs-content", "value"), Input("zip-dropdown", "value")],
-)
-def update_rent_scatter(tab_value, selected_zip):
-    if tab_value != "tab-rent" or not selected_zip:
-        raise exceptions.PreventUpdate
-
-    rent_scatterplot = create_rent_scatterplot(zip_code=selected_zip)
-    rent_title = f"Median monthly rent over time in zip code {selected_zip}"
-
-    return rent_scatterplot.to_dict(), rent_title
-
-
-# tab 4 : homeless scatterplot
+# tab 2 : homeless scatterplot
 @app.callback(
     [
         Output("homeless-1", "spec"),
@@ -739,6 +707,41 @@ def update_homeless_scatter(tab_value, selected_tract):
         encampment_title,
     )
 
+
+
+# tab3 : rent scatterplot
+@app.callback(
+    [Output("rent-scatter-plot", "spec"), Output("rent-plot-title", "children")],
+    [Input("tabs-content", "value"), Input("zip-dropdown", "value")],
+)
+def update_rent_scatter(tab_value, selected_zip):
+    if tab_value != "tab-rent" or not selected_zip:
+        raise exceptions.PreventUpdate
+
+    rent_scatterplot = create_rent_scatterplot(zip_code=selected_zip)
+    rent_title = f"Median monthly rent over time in zip code {selected_zip}"
+
+    return rent_scatterplot.to_dict(), rent_title
+
+
+
+# tab4 :regression
+@app.callback(
+    [
+        Output("reg-chart", "spec"),  # update
+                ],
+    [
+        Input("tabs-content", "value"),  # change in column
+    ],
+)
+def update_regression(tab_value):
+
+    if tab_value != "tab-reg":
+        raise exceptions.PreventUpdate
+
+    new_reg = create_reg_chart()
+
+    return [new_reg.to_dict()]
 
 if __name__ == "__main__":
     app.run(debug=True)

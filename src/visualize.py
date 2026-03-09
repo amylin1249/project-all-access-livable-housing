@@ -219,7 +219,7 @@ def create_reg_chart():
                 title="Coefficient (311 Calls)",
                 format=".3f",
             ),
-            alt.Tooltip("significant_str:N", title="Significant"),  # <- use calculated field
+            alt.Tooltip("significant_str:N", title="Statistically Significant"),  # <- use calculated field
         ]
     )
     .transform_calculate(
