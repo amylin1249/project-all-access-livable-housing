@@ -47,7 +47,9 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
     )
 
     # Merge aggregated dataframe with GeoDataFrame
-    merged_tracts_gdf = tracts_gdf.merge(filtered_df, left_on="GEOID", right_on="tract", how="left")
+    merged_tracts_gdf = tracts_gdf.merge(
+        filtered_df, left_on="GEOID", right_on="tract", how="left"
+    )
 
     # Create tooltips, and add last tooltip only if selected column name is not one of the existing tooltips
     tooltips = [
@@ -55,12 +57,24 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
         alt.Tooltip("population:Q", title="Population"),
         alt.Tooltip("median_rent:Q", format=",.0f", title="Median rent (per month)"),
         alt.Tooltip("eviction_rate:Q", format=".3%", title="Average eviction rate"),
-        alt.Tooltip("estimate:Q", format=",.0f", title="Average homeless population estimate"),
-        alt.Tooltip("311_calls:Q", format=",.0f", title="Average monthly citizen-reported encampments")
+        alt.Tooltip(
+            "estimate:Q", format=",.0f", title="Average homeless population estimate"
+        ),
+        alt.Tooltip(
+            "311_calls:Q",
+            format=",.0f",
+            title="Average monthly citizen-reported encampments",
+        ),
     ]
 
     if col_name in ["tents", "structures", "vehicles"]:
-        tooltips.append(alt.Tooltip(f"{col_name}:Q", format=",.0f", title=f"Average {METRIC_NAMES[col_name].lower()}"))
+        tooltips.append(
+            alt.Tooltip(
+                f"{col_name}:Q",
+                format=",.0f",
+                title=f"Average {METRIC_NAMES[col_name].lower()}",
+            )
+        )
 
     # Create base map for tracts with no data
     background = (
@@ -85,7 +99,7 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
                     offset=10,
                 ),
             ),
-            tooltip=tooltips
+            tooltip=tooltips,
         )
         .transform_lookup(
             lookup="GEOID",
@@ -113,8 +127,22 @@ def create_reg_chart():
 
     # Coefficients with varying effect sizes and significance
     output = run_reg()
-    coefficients = [output.params['med_rent'], output.params['med_hh_inc'], output.params['white_pct'], output.params['tents'], output.params['structures'], output.params['vehicles']]
-    std_errors = [output.bse['med_rent'], output.bse['med_hh_inc'], output.bse['white_pct'], output.bse['tents'], output.bse['structures'], output.bse['vehicles']]
+    coefficients = [
+        output.params["med_rent"],
+        output.params["med_hh_inc"],
+        output.params["white_pct"],
+        output.params["tents"],
+        output.params["structures"],
+        output.params["vehicles"],
+    ]
+    std_errors = [
+        output.bse["med_rent"],
+        output.bse["med_hh_inc"],
+        output.bse["white_pct"],
+        output.bse["tents"],
+        output.bse["structures"],
+        output.bse["vehicles"],
+    ]
 
     # Calculate 95% confidence intervals
     ci_lower = [
@@ -215,6 +243,7 @@ def create_reg_chart():
 
     return chart.resolve_scale(color="independent")
 
+
 def create_rent_scatterplot(zip_code: str):
     df = pd.read_csv(CLEAN_ZILLOW)
 
@@ -223,15 +252,23 @@ def create_rent_scatterplot(zip_code: str):
     filtered_df = df[df["zip"] == zip_code]
 
     chart = (
-            alt.Chart(filtered_df)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("date:T", title = "Date"),
-                y=alt.Y("rent:Q", title = "Median rent (per month)",scale=alt.Scale(zero=False)))
-            .properties(width="container", height=450,autosize=alt.AutoSizeParams(type='fit', contains='padding'))
+        alt.Chart(filtered_df)
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("date:T", title="Date"),
+            y=alt.Y(
+                "rent:Q", title="Median rent (per month)", scale=alt.Scale(zero=False)
+            ),
         )
+        .properties(
+            width="container",
+            height=450,
+            autosize=alt.AutoSizeParams(type="fit", contains="padding"),
+        )
+    )
 
     return chart
+
 
 def create_homeless_scatterplot(tract_id: str):
     """
@@ -247,9 +284,16 @@ def create_homeless_scatterplot(tract_id: str):
     chart = (
         alt.Chart(filtered_df)
         .mark_line(point=True)
-        .encode(x=alt.X("date:T", title = "Date"), y=alt.Y("estimate:Q", title = "Homeless Population Estimate"))
-        .properties(width="container", height=450, autosize=alt.AutoSizeParams(type='fit', contains='padding'))
-     )
+        .encode(
+            x=alt.X("date:T", title="Date"),
+            y=alt.Y("estimate:Q", title="Homeless Population Estimate"),
+        )
+        .properties(
+            width="container",
+            height=450,
+            autosize=alt.AutoSizeParams(type="fit", contains="padding"),
+        )
+    )
 
     return chart
 
@@ -262,17 +306,18 @@ def create_encampments_scatterplot(tract_id: str):
     filtered_df = df[df["tract"] == tract_id]
 
     folded_chart = (
-            alt.Chart(filtered_df)
-            .mark_line()
-            .transform_fold(
-                fold= ["structures", "tents", "vehicles"],
-                as_=["measurement", "value"],)
-            .encode(
-                x=alt.X("date:T", axis=alt.Axis(format="%Y", tickCount=12, labelAngle=0)),
-                y=alt.Y("value:Q"),
-                color=alt.Color("measurement:N"))
-            .properties(width="container", height=350)
+        alt.Chart(filtered_df)
+        .mark_line()
+        .transform_fold(
+            fold=["structures", "tents", "vehicles"],
+            as_=["measurement", "value"],
         )
+        .encode(
+            x=alt.X("date:T", axis=alt.Axis(format="%Y", tickCount=12, labelAngle=0)),
+            y=alt.Y("value:Q"),
+            color=alt.Color("measurement:N"),
+        )
+        .properties(width="container", height=350)
+    )
 
     return folded_chart
-

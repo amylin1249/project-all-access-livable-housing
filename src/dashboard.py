@@ -10,6 +10,7 @@ from .visualize import (
 import dash_vega_components as dvc
 import calendar
 import matplotlib
+
 matplotlib.use("Agg")
 from .datatypes import MERGED, CLEAN_ZILLOW
 import pandas as pd

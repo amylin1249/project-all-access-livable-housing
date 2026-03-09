@@ -326,7 +326,6 @@ def generate_311_csv():
     # Reorder columns for readability
     df = df.reindex(columns=["id", "date", "lat", "lon"])
 
-
     df.to_csv(CLEAN_311, index=False)
 
 
@@ -518,7 +517,7 @@ def generate_crosswalks_csv():
     # Aggregate dfs
     aggregated_df = pd.concat(list_of_dfs)
 
-     # Grab unique zip, tract pairs
+    # Grab unique zip, tract pairs
     zip_tract_pairs_df = aggregated_df[["zip", "tract"]].drop_duplicates()
     zip_tract_pairs = list(zip_tract_pairs_df.itertuples(index=False, name=None))
 
@@ -527,7 +526,9 @@ def generate_crosswalks_csv():
 
     # Fill in missing dates for zip, tract pairs with mean of existing data
     for zip, tract in zip_tract_pairs:
-        zip_tract_df = aggregated_df[(aggregated_df["zip"] == zip) & (aggregated_df["tract"] == tract)]
+        zip_tract_df = aggregated_df[
+            (aggregated_df["zip"] == zip) & (aggregated_df["tract"] == tract)
+        ]
         if len(zip_tract_df) < 20:
             average_res_ratio = zip_tract_df["res_ratio"].mean()
             for date in dates:
