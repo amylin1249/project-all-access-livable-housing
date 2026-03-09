@@ -15,6 +15,16 @@ List the sources of data, any gaps or challenges in the data. Explain how data f
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
 
+The first module in our data pipeline, process_data, imports the raw datasets, deduplicates key variables,standardizes selected fields, and exports the cleaned output to a CSV file in the cleaned-data folder. 
+Cleaning the 311 encampment reports requires additional processing of address strings and the removal of 
+duplicate latitude–longitude–month combinations. This step ensures that we measure the unique number of 
+encampments reported in a given month, rather than simply counting the total number of reports submitted. 
+
+To include: Overview of process_acs_data and get_sf_geoid, create_sf_shapefiles. 
+
+The second component of our pipeline is spatial_join.py, which implements the quadtree-based spatial matching algoirthm developed in our programming assignment. 
+This script matches point lat/lon coordinates to their appropriate census tract polygons. We apply this procedure to three cleaned datasets: the eviction records, 
+the quarterly encampment estimates, and 311 encampment reports.
 
 
 ## Team responsibilities
