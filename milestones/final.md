@@ -82,7 +82,7 @@ The last section is focused on visualizations and dashboarding. The visualize mo
 - Defined a weighted estimation logic using PIT data to calculate unsheltered population counts across various housing types
 - Calculated tract-level eviction rates by merging multi-source datasets and structuring results into a unified data dictionary
 - Wrote `pytest` tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
-- Refactored core plotting code of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
+- Refactored core map, plots, regression codes of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
 - Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics into a functional user experience
 
 ### Lily
