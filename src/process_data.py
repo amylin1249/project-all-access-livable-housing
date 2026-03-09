@@ -5,7 +5,7 @@ import geopandas as gpd
 from pathlib import Path
 from datetime import datetime
 import warnings
-from datatypes import (
+from .datatypes import (
     RAW_SF_TRACTS,
     RAW_ACS_POP,
     RAW_ACS_RENT,
