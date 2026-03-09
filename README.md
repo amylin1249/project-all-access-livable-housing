@@ -16,10 +16,19 @@ Overall, our project has a strong focus on spatial analysis and mapping, visuali
 
 
 ## Screenshots of project
+Dashboard Mainpage
 ![Dashboard Mainpage](docs/dash_mainpage.png)
+
+Dashboard Tab 1: Map
 ![Dashboard Tab 1: Map](docs/dash_tab1_map.png)
+
+Dashboard Tab 2: Linechart - Homelessness
 ![Dashboard Tab 2: Linechart - Homelessness](docs/dash_tab2_linechart_homelessness.png)
+
+Dashboard Tab 3: Linechart - Rent
 ![Dashboard Tab 3: Linechart - Rent](docs/dash_tab3_linechart_rent.png)
+
+Dashboard Tab 4: Regression
 ![Dashboard Tab 4: Regression](docs/dash_tab4_regression.png)
 
 
