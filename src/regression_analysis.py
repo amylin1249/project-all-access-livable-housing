@@ -20,6 +20,17 @@ from .datatypes import (
 
 
 def run_reg():
+
+    """
+    Runs a regression to understand the relationship between tract features and 
+    the unique number of reporte 311 addresses in a month
+
+    Parameters:
+        Read in several cleaned data files for process, including joined_encampment_tracts.csv, joined_311_tracts.csv, sf_census_tracts.csv
+
+    Returns:
+        RegressionResultsWrapper object, results2, with includes month fixed effects and errors clustered at the tract level
+    """
     # Step 1: Load in encampmment-tract crosswalk
     df_crosswalk = pd.read_csv(JOINED_ENCAMP_TRACTS)
 
