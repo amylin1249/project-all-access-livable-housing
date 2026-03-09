@@ -11,13 +11,6 @@ from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS, CLEAN_311, CLEAN_ENCA
 
 
 
-### Add tests on generate encampments and 311 CSVs
-
-## Tests for Lily to add on encampments and 311 CSVs
-
-
-
-
 def test_clean_address():
     assert clean_address("Intersection of ALABAMA ST and 15TH ST") == "alabama 15th"
     assert (
@@ -57,9 +50,6 @@ def test_generate_encampments_csv():
     assert max(df_encamp['vehicles']) < 100
 
     
-
-
-
 
 
 ACS_DF = pd.read_csv(SF_CENSUS_TRACTS)

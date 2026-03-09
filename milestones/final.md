@@ -23,7 +23,12 @@ Write a page or so describing the structure of your project. What modules exist?
 - 
 
 ### Lily
-- 
+- Wrote the initial draft of the clean encampment process and clean 311 process
+- The code for the clean encampment process includes helper code for address deduplication (clean_address and clean_parenthesis)
+- Wrote pytest code for test_clean_address, test_generate_311_csv, test_generate_encampments_csv
+- Wrote run_regression.py to merge necessary datasets and run regression results
+- Wrote code for the regression coefficient visualization (create_reg_chart) in visualize.py 
+- Wrote early versions code for two scatterplots - create_encampments_scatterplot, create_homeless_scatterplot (Amy finalized and embellished)
 
 ### Amy
 - 
