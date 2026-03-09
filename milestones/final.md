@@ -34,6 +34,7 @@ Write a page or so describing the structure of your project. What modules exist?
 - 
 
 ### Amanda
+- Co-wrote script (with Amy) to web-scrape publicly available shelter waitlist datasets (this was later archived due to limitations in upstream data availability)
 - Cleaned and processed Census and ACS data to consolidate key metrics into tract-level CSV and shapefile outputs
 - Implemented geospatial matching to assign point-based data (coordinates) to census tracts
 - Aggregated encampment reports and 311 service call data by month and census tract 
