@@ -72,6 +72,8 @@ app.layout = html.Div(
                     [
                         html.B("Eviction Rate"),
                         html.Br(),
+                        f"{df_merged['eviction_rate'].mean():.2%}",##here
+                        html.Br(),
                         f"{df_merged['eviction_rate'].mean():.2%}",
                     ],
                     style={"flex": "1", "textAlign": "center"},
@@ -80,6 +82,8 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.B("Average Rent"),
+                        html.Br(),
+                        f"${df_merged['median_rent'].mean():,.0f}",##here
                         html.Br(),
                         f"${df_merged['median_rent'].mean():,.0f}",
                     ],
@@ -90,6 +94,8 @@ app.layout = html.Div(
                     [
                         html.B("311 Calls"),
                         html.Br(),
+                        f"{df_merged['311_calls'].mean():,.0f}", ##here
+                         html.Br(),
                         f"{df_merged['311_calls'].mean():,.0f}",
                     ],
                     style={"flex": "1", "textAlign": "center"},
@@ -98,6 +104,8 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.B("Homelessness Estimate"),
+                        html.Br(),
+                        f"{df_merged['estimate'].mean():,.0f}", ##here
                         html.Br(),
                         f"{df_merged['estimate'].mean():,.0f}",
                     ],
