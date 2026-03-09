@@ -18,7 +18,7 @@ def run_reg():
         joined_encampment_tracts.csv, joined_311_tracts.csv, sf_census_tracts.csv
 
     Returns:
-        RegressionResultsWrapper object, results2, with includes month fixed
+        RegressionResultsWrapper object, results, with includes month fixed
         effects and errors clustered at the tract level
     """
     # Load encampmment-tract crosswalk data and aggregate by tract and date
@@ -50,10 +50,10 @@ def run_reg():
     merged_df = pd.merge(merged_df, acs_data, on=["geoid"], how="inner")
 
     # Run regression, define OLS model, and test with year-month fixed effects
-    model2 = smf.ols(
+    model = smf.ols(
         formula="total_encampments ~ med_rent + med_hh_inc + white_pct  + tents + structures + vehicles + C(date)",
         data=merged_df,
     )
-    results2 = model2.fit(cov_type="cluster", cov_kwds={"groups": merged_df["geoid"]})
+    results = model.fit(cov_type="cluster", cov_kwds={"groups": merged_df["geoid"]})
 
-    return results2
+    return results
