@@ -55,19 +55,45 @@ app.layout = html.Div(
                 html.P(
                     "San Francisco has experienced significant changes in housing and homelessness over the past several years. "
                     "Many factors, including rising rents and increased evictions, have contributed to a growing number of unhoused individuals across the city. "
-                    "This dashboard combines multiple data sources to provide a clearer picture of these trends. "
+                    "This interactive dashboard combines multiple data sources to provide a clearer picture of these trends. "
                     "Eviction rates and monthly median rent estimates help illustrate the pressures on housing affordability, "
                     "while citizen-reported encampments (311 service calls), city-reported encampments (official counts), and homeless population estimates "
                     "provide insights into patterns and concentrations of unhoused residents across the city. "
-                    "Use the interactive features below to explore how these metrics vary across San Francisco's census tracts over time."
+                    "Use the features below to explore how these metrics vary across San Francisco's census tracts over time."
                 ),
                 html.Hr(),
             ],
             style={"padding": "10px 40px", "color": "#34495e"},
         ),
         # [basic number showing]
+html.Div(
+    [
         html.Div(
             [
+<<<<<<< HEAD
+                html.B("Monthly Median Rent"),
+                html.Br(),
+                f"2021 (average): ${df_merged[df_merged['date'].between('2021-01','2021-12')]['median_rent'].mean():,.0f}",
+                html.Br(),
+                f"2024 (average): ${df_merged[df_merged['date'].between('2024-01','2024-12')]['median_rent'].mean():,.0f}",
+                html.Br(),
+                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['median_rent'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['median_rent'].mean())**(1/3)-1):.2%}",
+            ],
+            style={"flex": "1", "textAlign": "center"},
+        ),
+
+        html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+
+        html.Div(
+            [
+                html.B("311 Calls"),
+                html.Br(),
+                f"2021 (average): {df_merged[df_merged['date'].between('2021-01','2021-12')]['311_calls'].mean():,.0f}",
+                html.Br(),
+                f"2024 (average): {df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean():,.0f}",
+                html.Br(),
+                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['311_calls'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['311_calls'].mean())**(1/3)-1):.2%}",
+=======
                 html.Div(
                     [
                         html.B("Eviction Rate"),
@@ -111,17 +137,36 @@ app.layout = html.Div(
                     ],
                     style={"flex": "1", "textAlign": "center"},
                 ),
+>>>>>>> 634ae4cad52b52f27bb1f34c6255399ccf9a5400
             ],
-            style={
-                "display": "flex",
-                "alignItems": "center",
-                "padding": "20px",
-                "margin": "20px 40px",
-                "backgroundColor": "#f8f9fa",
-                "borderRadius": "10px",
-                "border": "1px solid #eee",
-            },
+            style={"flex": "1", "textAlign": "center"},
         ),
+
+        html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
+
+        html.Div(
+            [
+                html.B("Street Homeless Population Estimate"),
+                html.Br(),
+                f"2021 (average): {df_merged[df_merged['date'].between('2021-01','2021-12')]['estimate'].mean():,.0f}",
+                html.Br(),
+                f"2024 (average): {df_merged[df_merged['date'].between('2024-01','2024-12')]['estimate'].mean():,.0f}",
+                html.Br(),
+                f"Annual % change: {((df_merged[df_merged['date'].between('2024-01','2024-12')]['estimate'].mean() / df_merged[df_merged['date'].between('2021-01','2021-12')]['estimate'].mean())**(1/3)-1):.2%}",
+            ],
+            style={"flex": "1", "textAlign": "center"},
+        ),
+    ],
+    style={
+        "display": "flex",
+        "alignItems": "center",
+        "padding": "20px",
+        "margin": "20px 40px",
+        "backgroundColor": "#f8f9fa",
+        "borderRadius": "10px",
+        "border": "1px solid #eee",
+    },
+),
         # [Tabs]
         dcc.Tabs(
             id="tabs-content",
@@ -174,7 +219,7 @@ def render_content(tab):
                             id="column-dropdown",
                             options=[
                                 {
-                                    "label": "Homeless Population Estimate",
+                                    "label": "Street Homeless Population Estimate",
                                     "value": "estimate",
                                 },
                                 {"label": "Eviction Rate", "value": "eviction_rate"},
@@ -408,7 +453,7 @@ def render_content(tab):
                             options=[
                                 {"label": str(z), "value": str(z)} for z in all_zips
                             ],
-                            value=all_zips[0] if all_zips else None,
+                            value="94158",
                             clearable=False,
                         ),
                     ],
@@ -455,7 +500,7 @@ def render_content(tab):
                             options=[
                                 {"label": str(t), "value": str(t)} for t in all_tracts
                             ],
-                            value=all_tracts[0] if all_tracts else None,
+                            value="06075017700",
                             clearable=False,
                             style={"width": "300px", "color": "black"},
                         ),
