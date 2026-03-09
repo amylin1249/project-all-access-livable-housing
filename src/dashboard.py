@@ -341,73 +341,80 @@ def render_content(tab):
                 ),
             ]
         )
+    
+    #[tab2. reg]
+    if tab == "tab-reg":
+        return html.Div([
+            html.Div([
+                html.Div([
+                    html.B("How does the number of citizen-reported encampments (311 calls) correlate with tract-level characteristics?"),
+                ], style={
+                                "fontSize": "20px",
+                                "lineHeight": "1",
+                                "marginBottom": "20px",
+                                "textAlign": "center",
+                        }),
+            ], style={
+                "padding": "30px", 
+                "backgroundColor": "#f9f9f9", 
+                "borderRadius": "10px", 
+                "marginBottom": "20px", 
+                "border": "1px solid #ddd"  
+            }),
 
-    # [tab 2.regression]
-    elif tab == "tab-reg":
-        return html.Div(
-            [
-                html.Div(
-                    [
-                        html.H3(
-                            id="regression-title",
-                            style={"textAlign": "center", "color": "#2c3e50"},
-                        ),
-                        html.Hr(),
-                        dvc.Vega(
-                            id="reg-chart",
-                            spec={},
-                            style={
-                                "width": "100%",
-                                "height": "500px",
-                                "marginBottom": "30px",
-                            },
-                        ),
-                        # explaining regression
-                        html.Div(
-                            [
-                                html.P(
-                                    "We ran a regression to examine how tract-level characteristics are associated with "
-                                    "the number of encampments reported (measured as the total number of unique addresses "
-                                    "reported through 311). For each month in which point-in-time encampment estimates "
-                                    "were calculated, we matched those estimates to the total number of unique encampment "
-                                    "addresses reported in the 311 call data for that month, along with tract-level "
-                                    "demographic and socioeconomic characteristics from the ACS.",
-                                    style={"marginBottom": "15px"},
-                                ),
-                                html.P(
-                                    "The regression included month fixed effects. The results indicate that median household income "
-                                    "and median household rent are not significantly associated with the number of reported 311 "
-                                    "encampment addresses. However, a tract's racial composition appears to be related to reporting "
-                                    "behavior among residents: for every 10-percentage-point increase in the share of tract residents "
-                                    "who are White, approximately one additional encampment address is reported per month. "
-                                    "Note this does not include duplicate reports.",
-                                    style={"marginBottom": "15px"},
-                                ),
-                                html.P(
-                                    "Encampment characteristics are also strongly associated with reporting. Each additional tent "
-                                    "observed is associated with roughly 0.9 additional reported addresses in a month, and each "
-                                    "additional structure is associated with 0.64 additional reported addresses reported in a month. "
-                                    "In contrast, the number of vehicles in an encampment has no clear relationship with the number "
-                                    "of unique addresses reported. One possible explanation is that vehicles blend more easily into "
-                                    "the surrounding environment and are therefore less noticeably part of a homeless encampment."
-                                ),
-                            ],
-                            style={
-                                "width": "80%",
-                                "margin": "0 auto",
-                                "padding": "25px",
-                                "border": "1px solid #ddd",
-                                "borderRadius": "10px",
-                                "backgroundColor": "white",
-                            },
-                        ),
-                    ],
-                    style={
-                        "padding": "10px",
-                    },
-                )
-            ]
-        )
+            
+            html.Div([
+                 html.Div([
+                    # explaination
+                    html.P(
+                        "We ran a regression to examine how tract-level characteristics are associated with "
+                        "the number of encampments reported (measured as the total number of unique addresses "
+                        "reported through 311). For each month in which point-in-time encampment estimates "
+                        "were calculated, we matched those estimates to the total number of unique encampment "
+                        "addresses reported in the 311 call data for that month, along with tract-level "
+                        "demographic and socioeconomic characteristics from the ACS.",
+                        style={"marginBottom": "15px"},
+                    ),
+                    html.P(
+                        "The regression included month fixed effects. The results indicate that median household income "
+                        "and median household rent are not significantly associated with the number of reported 311 "
+                        "encampment addresses. However, a tract's racial composition appears to be related to reporting "
+                        "behavior among residents: for every 10-percentage-point increase in the share of tract residents "
+                        "who are White, approximately one additional encampment address is reported per month. "
+                        "Note this excludes duplicate reports.",
+                        style={"marginBottom": "15px"},
+                    ),
+                    html.P(
+                        "Encampment characteristics are also strongly associated with reporting. Each additional tent "
+                        "observed is associated with roughly 0.9 additional reported addresses in a month, and each "
+                        "additional structure is associated with 0.64 additional reported addresses reported in a month. "
+                        "In contrast, the number of vehicles in an encampment has no clear relationship with the number "
+                        "of unique addresses reported. One possible explanation is that vehicles blend more easily into "
+                        "the surrounding environment and are therefore less noticeably part of a homeless encampment."
+                    ),
+                    # regression
+                    dvc.Vega(
+                        id="reg-chart", 
+                        spec={}, 
+                        style={"width": "100%", "height": "500px"}
+                    ),
+                ], style={
+                    "padding": "25px", 
+                    "border": "1px solid #eee", 
+                    "borderRadius": "10px", 
+                    "backgroundColor": "#fff", 
+                    "lineHeight": "1.6",
+                    "color": "#34495e"
+                })
+            ], style={
+                "padding": "25px", 
+                "border": "1px solid #ddd", 
+                "borderRadius": "10px", 
+                "backgroundColor": "white",
+                "boxShadow": "0 2px 4px rgba(0,0,0,0.05)"
+            })
+        ])
+
 
     # [tab 3. Rent Scatter Plot]
     elif tab == "tab-rent":
@@ -659,8 +666,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
 @app.callback(
     [
         Output("reg-chart", "spec"),  # update
-        Output("regression-title", "children"),  # title-regression
-    ],
+                ],
     [
         Input("tabs-content", "value"),  # change in column
     ],
@@ -671,9 +677,8 @@ def update_regression(tab_value):
         raise exceptions.PreventUpdate
 
     new_reg = create_reg_chart()
-    reg_title = "How does the number of citizen-reported encampments (311 calls) correlate with tract-level characteristics?"
 
-    return new_reg.to_dict(), reg_title
+    return [new_reg.to_dict()]
 
 
 # tab3 : rent scatterplot
