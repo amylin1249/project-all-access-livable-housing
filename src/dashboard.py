@@ -56,8 +56,8 @@ app.layout = html.Div(
                     "San Francisco has experienced significant changes in housing and homelessness over the past several years. "
                     "Many factors, including rising rents and increased evictions, have contributed to a growing number of unhoused individuals across the city. "
                     "This interactive dashboard combines multiple data sources to provide a clearer picture of these trends. "
-                    "Eviction rates and monthly median rent estimates help illustrate the pressures on housing affordability, "
-                    "while citizen-reported encampments (311 service calls), city-reported encampments (official counts), and homeless population estimates "
+                    "Eviction rates and median monthly rent estimates help illustrate the pressures on housing affordability, "
+                    "while citizen-reported encampments (311 service calls), city-reported encampments (official counts), and street homeless population estimates "
                     "provide insights into patterns and concentrations of unhoused residents across the city. "
                     "Use the features below to explore how these metrics vary across San Francisco's census tracts over time."
                 ),
@@ -83,7 +83,7 @@ app.layout = html.Div(
                 html.Div("|", style={"fontSize": "24px", "color": "#ddd"}),
                 html.Div(
                     [
-                        html.B("Monthly Median Rent"),
+                        html.B("Median Monthly Rent"),
                         html.Br(),
                         f"2021 (average): ${df_merged[df_merged['date'].between('2021-01', '2021-12')]['median_rent'].mean():,.0f}",
                         html.Br(),
@@ -123,9 +123,9 @@ app.layout = html.Div(
             value="tab-map",
             children=[
                 dcc.Tab(label="Geospatial Map", value="tab-map"),
-                dcc.Tab(label="Regression Analysis", value="tab-reg"),
-                dcc.Tab(label="Monthly Rent", value="tab-rent"),
-                dcc.Tab(label="Homelessness", value="tab-homeless"),
+                dcc.Tab(label="Regression Analysis of 311 Calls", value="tab-reg"),
+                dcc.Tab(label="Median Monthly Rent", value="tab-rent"),
+                dcc.Tab(label="Street Homeless Population Estimate"),
             ],
             style={"margin": "20px 40px"},
         ),
@@ -201,7 +201,7 @@ def render_content(tab):
                                     "label": "Street Homeless Population Estimate",
                                     "value": "estimate",
                                 },
-                                {"label": "Monthly Median Rent", "value": "median_rent"},
+                                {"label": "Median Monthly Rent", "value": "median_rent"},
                                 {"label": "Eviction Rate", "value": "eviction_rate"},
                                 
                                 {
@@ -366,31 +366,15 @@ def render_content(tab):
                  html.Div([
                     # explaination
                     html.P(
-                        "We ran a regression to examine how tract-level characteristics are associated with "
-                        "the number of encampments reported (measured as the total number of unique addresses "
-                        "reported through 311). For each month in which point-in-time encampment estimates "
-                        "were calculated, we matched those estimates to the total number of unique encampment "
-                        "addresses reported in the 311 call data for that month, along with tract-level "
-                        "demographic and socioeconomic characteristics from the ACS.",
+                        "We ran a regression to examine how tract-level characteristics are associated with the number of encampments reported through 311 service calls (e.g., the number of encampments that citizens reported to the City of San Francisco by calling the 311 service number). For each month with official city encampment counts, we matched those counts to the total number of 311 calls for encampments for that month, along with tract-level demographic and socioeconomic characteristics from the ACS.",
                         style={"marginBottom": "15px"},
                     ),
                     html.P(
-                        "The regression included month fixed effects. The results indicate that median household income "
-                        "and median household rent are not significantly associated with the number of reported 311 "
-                        "encampment addresses. However, a tract's racial composition appears to be related to reporting "
-                        "behavior among residents: for every 10-percentage-point increase in the share of tract residents "
-                        "who are White, approximately one additional encampment address is reported per month. "
-                        "Note this excludes duplicate reports.",
+                        "The regression included month fixed effects. The results indicate that median household income and median monthly rent are not significantly associated with the number of citizen reports via 311 calls. However, a tract's racial composition appears to be related to reporting behavior among residents: for every 10-percentage-point increase in the share of tract residents who are white, approximately 1 additional encampment location is reported per month. Note that we de-duplicated the data, such that calls for the same address or latitude and longitude were only counted once.",
                         style={"marginBottom": "15px"},
                     ),
                     html.P(
-                        "Encampment characteristics are also strongly associated with reporting. Each additional tent "
-                        "observed is associated with roughly 0.9 additional reported addresses in a month, and each "
-                        "additional structure is associated with 0.64 additional reported addresses reported in a month. "
-                        "In contrast, the number of vehicles in an encampment has no clear relationship with the number "
-                        "of unique addresses reported. One possible explanation is that vehicles blend more easily into "
-                        "the surrounding environment and are therefore less noticeably part of a homeless encampment."
-                    ),
+                        "Certain encampment characteristics are also strongly associated with reporting. For every 0.94 additional tents observed in the official city count, approximately 1 additional encampment location is reported per month. And for every 0.64 additional structures observed in the official city count, approximately 1 additional encampment location is reported per month. In contrast, the number of lived-in vehicles in the official city count has no clear relationship with the number of 311 calls. One possible explanation is that lived-in vehicles blend more easily into the surrounding environment, and therefore, citizens may not perceive them as a homeless encampment."),
                     # regression
                     dvc.Vega(
                         id="reg-chart", 
@@ -652,7 +636,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
     METRIC_NAMES = {
         "311_calls": "Citizen-reported encampments (311 calls)",
         "eviction_rate": "Eviction rate",
-        "median_rent": "Monthly median rent",
+        "median_rent": "Median monthly rent",
         "tents": "Official city tent count",
         "structures": "Official city structure count",
         "vehicles": "Official city lived-in vehicle count",
@@ -721,7 +705,7 @@ def update_rent_scatter(tab_value, selected_zip):
         raise exceptions.PreventUpdate
 
     rent_scatterplot = create_rent_scatterplot(zip_code=selected_zip)
-    rent_title = f"Median rent (per month) over time in zip code {selected_zip}"
+    rent_title = f"Median monthly rent over time in zip code {selected_zip}"
 
     return rent_scatterplot.to_dict(), rent_title
 
@@ -742,7 +726,7 @@ def update_homeless_scatter(tab_value, selected_tract):
 
     homeless_scatterplot = create_homeless_scatterplot(tract_id=selected_tract)
     homeless_title1 = (
-        f"Homeless population estimate over time in census tract {selected_tract}"
+        f"Street homeless population estimate over time in census tract {selected_tract}"
     )
 
     encampments_scatterplot = create_encampments_scatterplot(tract_id=selected_tract)
