@@ -7,15 +7,8 @@ from src.process_data import (
     generate_311_csv,
     generate_encampments_csv,
 )
-from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS
+from src.datatypes import RAW_SF_TRACTS, SF_CENSUS_TRACTS, CLEAN_311, CLEAN_ENCAMP
 
-<<<<<<< HEAD
-from src.datatypes import (
-    CLEAN_311, CLEAN_ENCAMP    
-)
-=======
-from src.datatypes import CLEAN_311
->>>>>>> 46936f3dccbf3ab648f8f4479bb4f6c64122a606
 
 
 ### Add tests on generate encampments and 311 CSVs
@@ -42,22 +35,31 @@ def test_clean_address():
 
 def test_generate_311_csv():
     df_311 = pd.read_csv(CLEAN_311)
-<<<<<<< HEAD
     assert(sum(df_311.duplicated(subset=['date', 'lat', 'lon']))) == 0
     assert min(df_311['lat']) < 38 and min(df_311['lat']) > 36
+    assert min(df_311['date']) == '2020-01'
+    assert max(df_311['date']) == '2025-01'
     assert min(df_311['lon']) < -119 and min(df_311['lon']) > -123
 
 def test_generate_encampments_csv():
     df_encamp = pd.read_csv(CLEAN_ENCAMP)
+    assert len(df_encamp) == df_encamp['id'].nunique()
+    assert min(df_encamp['lat']) < 38 and min(df_encamp['lat']) > 36
+    assert min(df_encamp['lon']) < -119 and min(df_encamp['lon']) > -123
+    assert min(df_encamp['vehicles']) == 0
+    assert min(df_encamp['structures']) == 0
+    assert min(df_encamp['tents']) == 0
+    assert min(df_encamp['date']) == '2020-01'
+    assert max(df_encamp['date']) == '2025-01'
+    # set slightly arbitrary threshold 
+    assert max(df_encamp['vehicles']) < 100
+    assert max(df_encamp['structures']) < 100
+    assert max(df_encamp['vehicles']) < 100
+
     
 
 
 
-=======
-    assert (sum(df_311.duplicated(subset=["date", "lat", "lon"]))) == 0
-    assert min(df_311["lat"]) < 38 and min(df_311["lat"]) > 36
-    assert min(df_311["lon"]) < -119 and min(df_311["lon"]) > -123
->>>>>>> 46936f3dccbf3ab648f8f4479bb4f6c64122a606
 
 
 ACS_DF = pd.read_csv(SF_CENSUS_TRACTS)
