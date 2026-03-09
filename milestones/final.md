@@ -11,20 +11,68 @@
 ## Data Documentation
 List the sources of data, any gaps or challenges in the data. Explain how data flows through the project. What else would someone picking this project up for the first time need to understand?
 
+Source of Data
+#1: DataSF Open Data Portal
+    #1.1: 311 Cases
+    #1.2: Quarterly count of tents, structures, and lived-in vehicles
+    #1.3: Evictions data
+#2: Census Data
+    #2.1: ACS data on rental costs and demographic data
+    #2.2: Listing and geographic boundaries of census tracts in SF
+#3: Zillow Observed Renter Index (ZORI)
+#4: HUD Crosswalks
+#5: Sacramento 2024 PIT Count Report
+
+The data flows through a centralized pipeline starting with automated API extraction and CSV loading, followed by a transformation stage where ZIP-level ZORI data is crosswalked to Census Tracts and scaled using ACS median rent values to adjust local median rent variations. 311 calls and eviction records are grouped by month and tract to calculate monthly rates. Quarterly encampment data is interpolated to fill monthly gaps for tents, structures, and vehicles. A weighted homelessness estimate is calculated using predefined conservative multipliers for different encampment types. All processed streams are merged into a single Tidy CSV (merged_data.csv) regression analysis, spatial join, visualization and dashboard.
+
+
+
 
 ## Project Structure
 Write a page or so describing the structure of your project. What modules exist? What do they do? A diagram may be helpful here.
 
-The first module in our data pipeline, process_data, imports the raw datasets, deduplicates key variables,standardizes selected fields, and exports the cleaned output to a CSV file in the cleaned-data folder. 
-Cleaning the 311 encampment reports requires additional processing of address strings and the removal of 
-duplicate latitude–longitude–month combinations. This step ensures that we measure the unique number of 
-encampments reported in a given month, rather than simply counting the total number of reports submitted. 
+Tree structure of first level of directories and files in root:
+├── README.md
+├── __pycache__
+├── clean-data
+├── milestones
+├── pyproject.toml
+├── raw-data
+├── scratch
+├── src
+├── tests
+└── uv.lock
 
-To include: Overview of process_acs_data and get_sf_geoid, create_sf_shapefiles. 
+Tree structure of first level of directories and files in src:
+├── __init__.py
+├── __main__.py
+├── analyze_data.py
+├── dashboard.py
+├── datatypes.py
+├── get_api_data.py
+├── process_data.py
+├── run_regression.py
+├── spatial_join.py
+└── visualize.py
 
-The second component of our pipeline is spatial_join.py, which implements the quadtree-based spatial matching algoirthm developed in our programming assignment. 
-This script matches point lat/lon coordinates to their appropriate census tract polygons. We apply this procedure to three cleaned datasets: the eviction records, 
-the quarterly encampment estimates, and 311 encampment reports.
+Focusing on the src directory where we have our source code, we have 7 main modules spanning 3 key sections that later feed into __main__.py. The 3 key sections are as follows:
+1. Retrieving data (get_api_data)
+2. Cleaning and processing data (process_data, spatial_join, analyze_data, run_regression)
+3. Visualizing data (visualize, dashboard)
+The above modules are supported by datatypes, which contain global variables used across them.
+
+Starting from the first stage of retrieving data, the get_api_data module retrieves data from the evictions data API, which is saved to a CSV file.
+
+Under data cleaning and processing, we begin with process_data. This module processes and merges ACS data and census shapefiles, cleans and generates encampments and 311 homelessness reports data, filters and imputes missing Zillow data, and processes crosswalks excel files. Processing the ACS files requires imputing negative values. Cleaning the 311 encampment reports requires additional processing of address strings and the removal of duplicate latitude–longitude–month combinations. This step ensures that we measure the unique number of encampments reported in a given month, rather than simply counting the total number of reports submitted. Processing crosswalks also requires interpolation and matching of data from zip codes to tracts to get numbers for each tract. More generally, this module deduplicates key variables, standardizes selected fields, and exports the cleaned output to CSV files and shapefiles in the cleaned-data folder.
+
+spatial_join is the next module under data processing, which implements the quadtree-based spatial matching algorithm to match point lat/lon coordinates to their appropriate census tract polygons. This has been adapted from PA4 and modified to fit the specifications of our model. We apply this procedure to three cleaned datasets: evictions (api_evictions_data.csv), quarterly encampments (clean_encampments_data.csv), and 311 reports (clean_311_data.csv). It then outputs 3 files, one pertaining to each of the cleaned files, with an additional column with the matched tract ID. 
+
+Under data processing, we also have the analyze_data module, where we aggregate counts from the joined files (with tract IDs) to get the total counts for each tract, and combine all calculated metrics into a consolidated file. This file forms the basis of our analysis and subsequent visualizations.
+
+The final module under data processing is run_regression, whose primary purpose is to run a regression model to deepen understanding of the relationship between tract features and the unique number of reported 311 addresses in a given month with available point estimates. This employs statistical analysis, including ordinary least squares and year-month fixed effects to strengthen our analysis. 
+
+The last section is focused on visualizations and dashboarding. The visualize module forms the basis of the graphs that provide a visual representation of our data and analysis. These include a choropleth map representing different metrics across tracts over specified time periods, a regression chart that shows the results of regression analysis on 311 reports, and  
+
 
 
 ## Team responsibilities
@@ -34,7 +82,7 @@ the quarterly encampment estimates, and 311 encampment reports.
 - Built an automated API pipeline to retrieve, filter, and store real-time eviction records of SF into standardized CSV formats.
 - Defined a weighted estimation logic using PIT data to calculate unsheltered population counts across various housing types
 - Calculated tract-level eviction rates by merging multi-source datasets and structuring results into a unified data dictionary
-- Wrote 'pytest' tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
+- Wrote `pytest` tests to validate the accuracy of data extraction, filtering, and mathematical calculations.
 - Refactored core plotting code of visualizing to optimize visualization performance and ensure seamless interactivity within the dashboard
 - Spearheaded the development of a dashboard, designing the main interface and logic to synthesize housing and homelessness metrics into a functional user experience
 

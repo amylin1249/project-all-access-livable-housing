@@ -31,7 +31,7 @@ from .datatypes import (
     CLEAN_CROSSWALKS,
 )
 
-EXCLUDE_GEOID = "06075980401"
+EXCLUDE_GEOID = "06075980401" # Farallon Islands
 
 SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/sf_shapefiles"
 MERGED_SF_TRACTS_DIR = Path(__file__).parent.parent / "clean-data/merged_sf_shapefiles"
@@ -538,13 +538,3 @@ def generate_crosswalks_csv():
 
     # Output to CSV
     aggregated_df.to_csv(CLEAN_CROSSWALKS, index=None, header=True)
-
-
-if __name__ == "__main__":
-    process_acs_data()
-    create_sf_shapefiles()
-    add_sf_tract_data()
-    generate_311_csv()
-    generate_encampments_csv()
-    generate_zillow_csv()
-    generate_crosswalks_csv()
