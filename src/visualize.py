@@ -336,7 +336,7 @@ def create_encampments_scatterplot(tract_id: str):
 
     folded_chart = (
         alt.Chart(filtered_df)
-        .mark_line()
+        .mark_line(point=True)
         .transform_fold(
             fold=["structures", "tents", "vehicles"],
             as_=["measurement", "value"],
