@@ -1,7 +1,6 @@
+import calendar
 import pandas as pd
 import dash_bootstrap_components as dbc
-import matplotlib
-import calendar
 import dash_vega_components as dvc
 from dash import Dash, html, dcc, Input, Output, exceptions
 from .datatypes import MERGED, CLEAN_ZILLOW
@@ -12,8 +11,6 @@ from .visualize import (
     create_homeless_scatterplot,
     create_encampments_scatterplot,
 )
-
-matplotlib.use("Agg")
 
 
 df_merged = pd.read_csv(MERGED)
@@ -137,6 +134,7 @@ def render_content(tab):
     if tab == "tab-map":
         return html.Div(
             [
+                # first box : title and texts
                 html.Div(
                     [
                         html.Div(
@@ -302,7 +300,7 @@ def render_content(tab):
                         "marginBottom": "20px",
                     },
                 ),
-                # map
+                # second box : map
                 html.Div(
                     [
                         html.H3(
@@ -330,7 +328,6 @@ def render_content(tab):
                         "border": "1px solid #ddd",
                         "borderRadius": "10px",
                         "backgroundColor": "white",
-                        # "boxSizing": "border-box",
                     },
                 ),
             ]
@@ -340,8 +337,10 @@ def render_content(tab):
     if tab == "tab-homeless":
         return html.Div(
             [
+                # first box : itle and texts
                 html.Div(
                     [
+                        # texts
                         html.Div(
                             [
                                 html.B(
@@ -370,7 +369,9 @@ def render_content(tab):
                                 " over ",
                                 html.B("time"),
                                 ". While the graph on the right shows the distribution of encampment types (tents, structures, and lived-in vehicles), the graph on the left shows street homeless population estimates, calculated by multiplying each encampment count by the average number of people residing in a tent, structure, or lived-in vehicle. The ",
-                                html.B("highest average street homeless population estimates"),
+                                html.B(
+                                    "highest average street homeless population estimates"
+                                ),
                                 " from 2020 to 2024 are ",
                                 html.B("6075980900 (Islais Creek)"),
                                 ", ",
@@ -400,6 +401,7 @@ def render_content(tab):
                                 "marginBottom": "20px",
                             },
                         ),
+                        # dropdown
                         html.Label("Select Census Tract ID:"),
                         dcc.Dropdown(
                             id="tract-dropdown",
@@ -419,7 +421,7 @@ def render_content(tab):
                         "border": "1px solid #e9ecef",
                     },
                 ),
-                # scatter plots
+                # second box : scatter plots
                 html.Div(
                     [
                         # left plot
@@ -478,6 +480,7 @@ def render_content(tab):
     elif tab == "tab-rent":
         return html.Div(
             [
+                # first box : title and texts
                 html.Div(
                     [
                         html.Div(
@@ -513,7 +516,7 @@ def render_content(tab):
                                 html.B("94105 (Financial District/South Beach)"),
                                 ", and ",
                                 html.B("94114 (the Castro/Noe Valley)"),
-                                ". Mission Bay and the Financial District/South Beach have a high concentration of luxury rental apartments and are located near major tech and finance employment centers, while Noe Valley is a historic and highly desirable residential neighborhood with limited housing supply."
+                                ". Mission Bay and the Financial District/South Beach have a high concentration of luxury rental apartments and are located near major tech and finance employment centers, while Noe Valley is a historic and highly desirable residential neighborhood with limited housing supply.",
                             ],
                             style={
                                 "fontSize": "16px",
@@ -554,7 +557,7 @@ def render_content(tab):
                         "marginBottom": "20px",
                     },
                 ),
-                # scatter plot
+                # second box : scatter plot
                 html.Div(
                     [
                         html.H3(id="rent-plot-title", style={"textAlign": "center"}),
@@ -579,6 +582,7 @@ def render_content(tab):
     else:
         return html.Div(
             [
+                # first box : title
                 html.Div(
                     [
                         html.Div(
@@ -603,6 +607,7 @@ def render_content(tab):
                         "border": "1px solid #ddd",
                     },
                 ),
+                # second box : texts and regression
                 html.Div(
                     [
                         html.Div(
@@ -713,7 +718,7 @@ def update_map(selected_col, start_year, start_month, end_year, end_month):
 # tab 2 : homeless scatterplot
 @app.callback(
     [
-        Output("homeless-1", "spec"),
+        Output("homeless-1", "spec"),  # update
         Output("homeless-title-1", "children"),
         Output("homeless-2", "spec"),
         Output("homeless-title-2", "children"),
@@ -740,7 +745,10 @@ def update_homeless_scatter(tab_value, selected_tract):
 
 # tab3 : rent scatterplot
 @app.callback(
-    [Output("rent-scatter-plot", "spec"), Output("rent-plot-title", "children")],
+    [
+        Output("rent-scatter-plot", "spec"),
+        Output("rent-plot-title", "children"),
+    ],  # update
     [Input("tabs-content", "value"), Input("zip-dropdown", "value")],
 )
 def update_rent_scatter(tab_value, selected_zip):
@@ -759,7 +767,7 @@ def update_rent_scatter(tab_value, selected_zip):
         Output("reg-chart", "spec"),  # update
     ],
     [
-        Input("tabs-content", "value"),  # change in column
+        Input("tabs-content", "value"),
     ],
 )
 def update_regression(tab_value):
