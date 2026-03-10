@@ -770,7 +770,3 @@ def update_regression(tab_value):
 
     return [new_reg.to_dict()]
 
-
-if __name__ == "__main__":
-    logging.getLogger("werkzeug").setLevel(logging.ERROR)
-    app.run_server(debug=False, dev_tools_ui=False, dev_tools_props_check=False)
