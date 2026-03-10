@@ -11,7 +11,6 @@ from .process_data import (
 )
 from .spatial_join import join_tracts_csv
 from .analyze_data import generate_tidy_csv
-
 from .datatypes import (
     CLEAN_EVICTIONS,
     CLEAN_ENCAMP,
@@ -41,7 +40,8 @@ def main():
             save_evictions_to_csv(result)
         print("Pulled data from relevant API")
 
-        # Run functions from process_data module to generate intermediate data files from raw data
+        # Run functions from process_data module to generate intermediate data files
+        # from raw data
         process_acs_data()
         create_sf_shapefiles()
         add_sf_tract_data()
@@ -53,7 +53,8 @@ def main():
             "Generated all intermediate clean data files required for further analysis"
         )
 
-        # Run functions from spatial_join module to match location points to their respective tracts
+        # Run functions from spatial_join module to match location points to their
+        # respective tracts
         join_tracts_csv(CLEAN_EVICTIONS, JOINED_EVICTIONS_TRACTS)
         join_tracts_csv(CLEAN_ENCAMP, JOINED_ENCAMP_TRACTS)
         join_tracts_csv(CLEAN_311, JOINED_311_TRACTS)
@@ -61,7 +62,8 @@ def main():
             "Matched all point data to tracts for those that fall within a matching SF tract"
         )
 
-        # Run function from analyze module to generate a consolidated data file with key metrics for visualization
+        # Run function from analyze module to generate a consolidated data file
+        # with key metrics for visualization
         generate_tidy_csv()
         print("Generated a consolidated CSV to be used in visualization")
 

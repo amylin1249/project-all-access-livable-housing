@@ -214,7 +214,8 @@ def test_spatial_join_csv_cols():
     joined_encamp_df = pd.read_csv(JOINED_ENCAMP_TRACTS)
     joined_311_df = pd.read_csv(JOINED_311_TRACTS)
 
-    # Test that joined datasets have exactly one more column than the clean datasets for the matched tract ID
+    # Test that joined datasets have exactly one more column than the clean datasets
+    # for the matched tract ID
     assert len(joined_evictions_df.columns) == len(clean_evictions_df.columns) + 1
     assert len(joined_encamp_df.columns) == len(clean_encamp_df.columns) + 1
     assert len(joined_311_df.columns) == len(clean_311_df.columns) + 1

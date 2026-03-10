@@ -42,9 +42,6 @@ def load_shapefiles(path: Path) -> list[Tract]:
     return tracts
 
 
-### Include code that loads the points data from other sources
-
-
 class QuadtreeError(Exception):
     """Exception used within Quadtree for unexpected cases"""
 
