@@ -13,7 +13,7 @@ CLEAN_DATA_DIR = Path(__file__).parent.parent / "clean-data"
 
 def get_evictions_data() -> list[tuple]:
     """
-    Retrieve coordinates and dates of evictions in San Francisco from 2020-2024.
+    Retrieve coordinates and dates of evictions in San Francisco from 2020-2024, making ID.
 
     Returns:
         List of tuples (id, lat, lon, YYYY-MM) with coordinates and dates of evictions.
@@ -31,6 +31,7 @@ def get_evictions_data() -> list[tuple]:
         location = data.get("client_location")
         date_raw = data.get("file_date")
 
+        # change dataetime format
         if location and date_raw:
             date_obj = datetime.strptime(date_raw, "%Y-%m-%dT%H:%M:%S.%f")
             year = date_obj.year
@@ -41,6 +42,7 @@ def get_evictions_data() -> list[tuple]:
                 lat = location.get("latitude")
                 lon = location.get("longitude")
 
+                # making ID
                 if lat and lon:
                     date = date_obj.strftime("%Y-%m")
                     record = {
