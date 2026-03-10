@@ -323,7 +323,7 @@ def generate_311_csv():
 
     # Drop observations where lat/lon = NA
     df = df.dropna(subset=["lat", "lon"])
-    
+
     # De-dupe by lat, lon, and month (keep only one row per lat/lon pair per month)
     df = df.drop_duplicates(subset=["date", "lat", "lon"], keep="first")
 
@@ -539,12 +539,16 @@ def generate_crosswalks_csv():
     for _, row in zip_tract_pairs.iterrows():
         zip_code = row["zip"]
         tract = row["tract"]
-        zip_tract_df = aggregated_df[(aggregated_df["zip"] == zip_code) & (aggregated_df["tract"] == tract)]
+        zip_tract_df = aggregated_df[
+            (aggregated_df["zip"] == zip_code) & (aggregated_df["tract"] == tract)
+        ]
         if len(zip_tract_df) < 20:
             average_res_ratio = zip_tract_df["res_ratio"].mean()
             for dt in dates:
                 if zip_tract_df[zip_tract_df["date"] == dt].empty:
-                    missing_zip_tract_rows.append([zip_code, tract, average_res_ratio, dt])
+                    missing_zip_tract_rows.append(
+                        [zip_code, tract, average_res_ratio, dt]
+                    )
 
     aggregated_df = pd.concat(
         [
