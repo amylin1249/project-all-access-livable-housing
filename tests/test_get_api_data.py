@@ -15,7 +15,7 @@ def test_api_fetch(eviction_results):
 def test_api_conversion(eviction_results):
     sample = eviction_results[0]
     assert len(sample) == 4
-
+    # check if data is in wanted types
     assert isinstance(sample["id"], int)
     assert isinstance(sample["lat"], float)
     assert isinstance(sample["lon"], float)
@@ -26,6 +26,7 @@ def test_api_conversion(eviction_results):
 def test_api_year_in_range(eviction_results):
     for date in eviction_results:
         year = int(date["year_mon"][:4])
+        # check if getting the filered date
         assert 2020 <= year <= 2024
 
 
