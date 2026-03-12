@@ -47,7 +47,8 @@ def create_tract_map(start_date: str, end_date: str, col_name: str):
         filtered_df, left_on="GEOID", right_on="tract", how="left"
     )
 
-    # Create tooltips, and add last tooltip only if selected column name is not one of the existing tooltips
+    # Create tooltips, and add last tooltip only if selected column name is not
+    # one of the existing tooltips
     tooltips = [
         alt.Tooltip("GEOID:N", title="Tract ID"),
         alt.Tooltip("population:Q", title="Population"),
@@ -256,7 +257,8 @@ def create_reg_chart():
 
 def create_rent_scatterplot(zip_code: str):
     """
-    Create an Altair line chart showing the temporal trend of median monthly rent for a specific zip code using Zillow data.
+    Create an Altair line chart showing the temporal trend of median monthly rent
+    for a specific zip code using Zillow data.
 
     Parameters:
         zip_code (str): A 5-digit string representing the target zip code.
@@ -293,7 +295,8 @@ def create_rent_scatterplot(zip_code: str):
 
 def create_homeless_scatterplot(tract_id: str):
     """
-    Create an Altair line chart showing the estimated homeless population trends over time for a specific census tract.
+    Create an Altair line chart showing the estimated homeless population trends
+    over time for a specific census tract.
 
     Parameters:
         tract_id (str): An 11-digit string representing the target census tract.
@@ -329,7 +332,8 @@ def create_homeless_scatterplot(tract_id: str):
 
 def create_encampments_scatterplot(tract_id: str):
     """
-    Create a multi-series Altair line chart breaking down encampment types (tents, vehicles, and structures) over time for a specific tract.
+    Create a multi-series Altair line chart breaking down encampment types
+    (tents, vehicles, and structures) over time for a specific tract.
 
     Parameters:
         tract_id (str): An 11-digit string representing the target census tract.
