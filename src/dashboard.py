@@ -27,6 +27,8 @@ app = Dash(
     __name__, external_stylesheets=[dbc.themes.MORPH], suppress_callback_exceptions=True
 )
 
+server = app.server
+
 app.layout = html.Div(
     [
         # [Title]
